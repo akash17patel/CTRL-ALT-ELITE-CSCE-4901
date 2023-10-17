@@ -118,7 +118,13 @@ class SettingsDrawer extends StatelessWidget {
           ListTile(
             title: Text('Password Reset'),
             onTap: () {
-              // Implement the action for Option 2, e.g., navigate to a different page
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return PasswordResetPage();
+                  },
+                ),
+              );
             },
           ),
           // Add more ListTile items for additional options
@@ -158,6 +164,72 @@ class _SettingsTabState extends State<SettingsTab> {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PasswordResetPage extends StatefulWidget {
+  @override
+  _PasswordResetPageState createState() => _PasswordResetPageState();
+}
+
+class _PasswordResetPageState extends State<PasswordResetPage> {
+  String _email = '';
+  String _message = ''; // Variable to store the message
+
+  void _resetPassword() {
+    if (_email.contains('@')) {
+      setState(() {
+        _message = 'Sent'; // Email is valid, set the message to 'Sent'
+      });
+    } else {
+      setState(() {
+        _message =
+            'Email Invalid'; // Email is invalid, set the message to 'Email Invalid'
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Password Reset'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  _email = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'Enter your email',
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                _resetPassword();
+              },
+              child: Text('Reset Password'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              _message, // Display message based on email validation
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
