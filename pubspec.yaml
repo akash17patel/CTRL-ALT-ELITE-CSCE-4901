@@ -61,9 +61,34 @@ flutter:
     - family: Merriweather-Regular
       fonts:
         - asset: fonts/Merriweather-Regular.ttf
+
     - family: Merriweather-Bold
       fonts:
         - asset: fonts/Merriweather-Bold.ttf
+
+    - family: Merriweather-LightItalic
+      fonts:
+        - asset: fonts/Merriweather-LightItalic.ttf
+
+    - family: Merriweather-Light
+      fonts:
+        - asset: fonts/Merriweather-Light.ttf
+
+    - family: Merriweather-Italic
+      fonts:
+        - asset: fonts/Merriweather-Italic.ttf
+
+    - family: Merriweather-BoldItalic
+      fonts:
+        - asset: fonts/Merriweather-BoldItalic.ttf
+
+    - family: Merriweather-BlackItalic
+      fonts:
+        - asset: fonts/Merriweather-BlackItalic.ttf
+
+    - family: Merriweather-Black
+      fonts:
+        - asset: fonts/Merriweather-Black.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
