@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import the image_picker package
-import 'dart:io'; // Import 'dart:io' for File class
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class MyProfilePage extends StatefulWidget {
   @override
@@ -8,10 +9,10 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  String firstName = 'John'; // Replace with user data
-  String lastName = 'Doe'; // Replace with user data
-  String email = 'johndoe@email.com'; // Replace with user data
-  String phoneNumber = '123-456-7890'; // Replace with user data
+  String firstName = 'John';
+  String lastName = 'Doe';
+  String email = 'johndoe@email.com';
+  String phoneNumber = '123-456-7890';
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
@@ -19,15 +20,31 @@ class _MyProfilePageState extends State<MyProfilePage> {
   TextEditingController phoneNumberController = TextEditingController();
 
   bool isEditing = false;
-  File? profilePictureFile; // Use File from dart:io
+  File? profilePictureFile;
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
-    firstNameController.text = firstName;
-    lastNameController.text = lastName;
-    emailController.text = email;
-    phoneNumberController.text = phoneNumber;
+    initSharedPreferences();
+  }
+
+  Future<void> initSharedPreferences() async {
+    prefs =
+        await SharedPreferences.getInstance(); // Initialize SharedPreferences
+    if (mounted) {
+      await loadProfileData();
+    }
+  }
+
+  Future<void> loadProfileData() async {
+    setState(() {
+      firstName = prefs.getString('firstName') ?? firstName;
+      lastName = prefs.getString('lastName') ?? lastName;
+      email = prefs.getString('email') ?? email;
+      phoneNumber = prefs.getString('phoneNumber') ?? phoneNumber;
+      // Load the profile picture file here if available
+    });
   }
 
   @override
@@ -48,48 +65,52 @@ class _MyProfilePageState extends State<MyProfilePage> {
   Future<void> pickProfilePicture() async {
     final picker = ImagePicker();
 
-    // Show options to select from camera or gallery
-    showDialog(
+    // Show a bottom sheet to let the user choose between gallery and camera.
+    final pickedSource = await showModalBottomSheet<ImageSource>(
       context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text("Choose an option"),
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () async {
-                Navigator.pop(context);
-                final pickedFile =
-                    await picker.pickImage(source: ImageSource.gallery);
-                _updateProfilePicture(pickedFile);
-              },
-              child: Text("Pick from Gallery"),
-            ),
-            SimpleDialogOption(
-              onPressed: () async {
-                Navigator.pop(context);
-                final pickedFile =
-                    await picker.pickImage(source: ImageSource.camera);
-                _updateProfilePicture(pickedFile);
-              },
-              child: Text("Take a Photo"),
-            ),
-          ],
-        );
-      },
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(Icons.photo_library),
+            title: Text('Gallery'),
+            onTap: () => Navigator.pop(context, ImageSource.gallery),
+          ),
+          ListTile(
+            leading: Icon(Icons.camera),
+            title: Text('Camera'),
+            onTap: () => Navigator.pop(context, ImageSource.camera),
+          ),
+        ],
+      ),
     );
+
+    // If the user selected a source, pick an image from that source.
+    if (pickedSource != null) {
+      final pickedFile = await picker.pickImage(
+        source: pickedSource,
+      );
+
+      if (pickedFile != null) {
+        _updateProfilePicture(File(pickedFile.path));
+      }
+    }
   }
 
-  void _updateProfilePicture(XFile? pickedFile) {
+  void _updateProfilePicture(File? pickedFile) {
     setState(() {
-      profilePictureFile = pickedFile != null ? File(pickedFile.path) : null;
+      profilePictureFile = pickedFile;
     });
   }
 
-  void saveChanges() {
-    // Implement the logic to save the changes
+  Future<void> saveChanges() async {
+    await prefs.setString('firstName', firstNameController.text);
+    await prefs.setString('lastName', lastNameController.text);
+    await prefs.setString('email', emailController.text);
+    await prefs.setString('phoneNumber', phoneNumberController.text);
+
     setState(() {
       isEditing = false;
-      // Update the values with the edited text
       firstName = firstNameController.text;
       lastName = lastNameController.text;
       email = emailController.text;
@@ -126,9 +147,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   child: CircleAvatar(
                     radius: 50,
                     backgroundImage: profilePictureFile != null
-                        ? FileImage(profilePictureFile!) as ImageProvider
-                        : AssetImage(
-                            'assets/profile_picture.jpg'), // Provide a default image asset
+                        ? FileImage(profilePictureFile!)
+                        : AssetImage('assests/profileimg/')
+                            as ImageProvider<Object>,
                   ),
                 ),
                 if (isEditing)

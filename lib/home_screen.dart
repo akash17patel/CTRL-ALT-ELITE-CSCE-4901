@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'settings_drawer.dart';
-import 'settings_tab.dart';
+import 'menu_drawer.dart';
+import 'menu_tab.dart';
 import 'home_tab.dart';
 import 'common.dart';
 
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.settings),
+              icon: Icon(Icons.menu),
               onPressed: () {
                 _scaffoldKey.currentState?.openEndDrawer();
               },

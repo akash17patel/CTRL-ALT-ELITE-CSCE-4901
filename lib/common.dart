@@ -3,6 +3,19 @@ import 'package:flutter/material.dart';
 // Common constants
 const primaryColor = Color.fromRGBO(128, 32, 217, 1.0);
 
+class AppConstants {
+  // Text Sizes
+  static const double textSizeSmall = 12.0;
+  static const double textSizeMedium = 16.0;
+  static const double textSizeLarge = 20.0;
+
+  // Colors
+  static const Color mainColor = Color(0xFF6200EE); // Purple
+  static const Color backgroundColor = Color(0xFFFFFFFF); // White
+  static const Color textColor = Color(0xFF000000); // Black
+  static const Color secondaryColor = Color(0xFF03DAC6); // Teal
+}
+
 // Common AppBar widget
 AppBar buildAppBar(String title, GlobalKey<ScaffoldState> scaffoldKey) {
   return AppBar(
@@ -19,7 +32,7 @@ AppBar buildAppBar(String title, GlobalKey<ScaffoldState> scaffoldKey) {
     ),
     actions: [
       IconButton(
-        icon: Icon(Icons.settings),
+        icon: Icon(Icons.menu),
         onPressed: () {
           scaffoldKey.currentState?.openEndDrawer();
         },
