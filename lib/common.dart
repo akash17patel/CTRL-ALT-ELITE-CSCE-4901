@@ -14,6 +14,11 @@ class AppConstants {
   static const Color backgroundColor = Color(0xFFFFFFFF); // White
   static const Color textColor = Color(0xFF000000); // Black
   static const Color secondaryColor = Color(0xFF03DAC6); // Teal
+
+  // Define a function to get the theme based on dark mode
+  static ThemeData getTheme(bool isDarkMode) {
+    return isDarkMode ? ThemeData.dark() : ThemeData.light();
+  }
 }
 
 // Common AppBar widget

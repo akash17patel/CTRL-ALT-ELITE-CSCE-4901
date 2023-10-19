@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'menu_drawer.dart';
 import 'menu_tab.dart';
 import 'home_tab.dart';
-import 'common.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
