@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mindlift_flutter/conversation_history_screen.dart';
 import 'constants.dart';
-import 'settings.dart';
-import 'chat.dart';
+import 'settings_screen.dart';
+import 'chat_screen.dart';
 
 
 void main() {
@@ -118,6 +119,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: Text('Go to Chat'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ConversationHistoryScreen()),
+                );
+              },
+              child: Text('Go to Conversation History'),
             ),
           ],
         ),
