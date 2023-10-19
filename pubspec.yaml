@@ -97,9 +97,6 @@ flutter:
 
   assets:
     - assets/profileimg/
-    - assets/achievement1.png
-    - assets/achievement2.png
-    - assets/achievement3.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
