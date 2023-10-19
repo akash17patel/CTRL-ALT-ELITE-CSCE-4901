@@ -34,6 +34,7 @@ dependencies:
   shared_preferences: ^2.0.12
   path_provider: ^2.0.2
   provider: ^6.0.5
+  fl_chart: ^0.64.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -96,6 +97,9 @@ flutter:
 
   assets:
     - assets/profileimg/
+    - assets/achievement1.png
+    - assets/achievement2.png
+    - assets/achievement3.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
