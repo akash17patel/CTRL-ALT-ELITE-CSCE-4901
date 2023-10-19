@@ -1,7 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 
 class MyProfilePage extends StatefulWidget {
   @override
@@ -9,112 +8,99 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  String firstName = 'John';
-  String lastName = 'Doe';
-  String email = 'johndoe@email.com';
-  String phoneNumber = '123-456-7890';
-
-  TextEditingController firstNameController = TextEditingController();
+  File? _image;
+  TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
-
-  bool isEditing = false;
-  File? profilePictureFile;
-  late SharedPreferences prefs;
-
-  @override
-  void initState() {
-    super.initState();
-    initSharedPreferences();
-  }
-
-  Future<void> initSharedPreferences() async {
-    prefs =
-        await SharedPreferences.getInstance(); // Initialize SharedPreferences
-    if (mounted) {
-      await loadProfileData();
-    }
-  }
-
-  Future<void> loadProfileData() async {
-    setState(() {
-      firstName = prefs.getString('firstName') ?? firstName;
-      lastName = prefs.getString('lastName') ?? lastName;
-      email = prefs.getString('email') ?? email;
-      phoneNumber = prefs.getString('phoneNumber') ?? phoneNumber;
-      // Load the profile picture file here if available
-    });
-  }
+  bool isEditing = false; // Track editing mode
 
   @override
   void dispose() {
-    firstNameController.dispose();
+    nameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
     phoneNumberController.dispose();
     super.dispose();
   }
 
-  void toggleEditing() {
-    setState(() {
-      isEditing = !isEditing;
-    });
-  }
+  Future _getImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().getImage(source: source);
 
-  Future<void> pickProfilePicture() async {
-    final picker = ImagePicker();
-
-    // Show a bottom sheet to let the user choose between gallery and camera.
-    final pickedSource = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: Icon(Icons.photo_library),
-            title: Text('Gallery'),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-          ListTile(
-            leading: Icon(Icons.camera),
-            title: Text('Camera'),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
-          ),
-        ],
-      ),
-    );
-
-    // If the user selected a source, pick an image from that source.
-    if (pickedSource != null) {
-      final pickedFile = await picker.pickImage(
-        source: pickedSource,
-      );
-
-      if (pickedFile != null) {
-        _updateProfilePicture(File(pickedFile.path));
-      }
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
     }
   }
 
-  void _updateProfilePicture(File? pickedFile) {
-    setState(() {
-      profilePictureFile = pickedFile;
-    });
+  Future<void> _showImageSourceOptions() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                InkWell(
+                  onTap: () {
+                    _getImage(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.photo_library,
+                      color: Color.fromARGB(255, 73, 153, 36),
+                    ),
+                    title: Text(
+                      'Gallery',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 73, 153, 36),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                InkWell(
+                  onTap: () {
+                    _getImage(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.photo_camera,
+                      color: Color.fromARGB(255, 73, 153, 36),
+                    ),
+                    title: Text(
+                      'Camera',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 73, 153, 36),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> saveChanges() async {
-    await prefs.setString('firstName', firstNameController.text);
-    await prefs.setString('lastName', lastNameController.text);
-    await prefs.setString('email', emailController.text);
-    await prefs.setString('phoneNumber', phoneNumberController.text);
-
+  void toggleEditing() {
     setState(() {
-      isEditing = false;
-      firstName = firstNameController.text;
-      lastName = lastNameController.text;
-      email = emailController.text;
-      phoneNumber = phoneNumberController.text;
+      isEditing = !isEditing;
     });
   }
 
@@ -124,67 +110,89 @@ class _MyProfilePageState extends State<MyProfilePage> {
       appBar: AppBar(
         title: Text('My Profile'),
         actions: [
-          isEditing
-              ? IconButton(
-                  icon: Icon(Icons.save),
-                  onPressed: saveChanges,
-                )
-              : IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: toggleEditing,
-                ),
+          IconButton(
+            icon: Icon(isEditing ? Icons.save : Icons.edit),
+            onPressed: () {
+              if (isEditing) {
+                // Handle the save action here
+                // You can access the edited data from the controllers
+              }
+              toggleEditing();
+            },
+          ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
+      body: ListView(
+        children: <Widget>[
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
                 GestureDetector(
-                  onTap: isEditing ? pickProfilePicture : null,
+                  onTap: isEditing ? _showImageSourceOptions : null,
                   child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: profilePictureFile != null
-                        ? FileImage(profilePictureFile!)
-                        : AssetImage('assests/profileimg/')
-                            as ImageProvider<Object>,
+                    radius: 60,
+                    backgroundImage: _image != null ? FileImage(_image!) : null,
+                    child: _image == null
+                        ? Icon(Icons.camera_alt, size: 60, color: Colors.white)
+                        : null,
                   ),
                 ),
-                if (isEditing)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.camera_alt),
-                  ),
+                SizedBox(height: 20),
+                ListTile(
+                  title: Text('Name:'),
+                  subtitle: isEditing
+                      ? TextFormField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your name',
+                          ),
+                        )
+                      : Text(nameController.text), // Display the saved name
+                ),
+                ListTile(
+                  title: Text('Last Name:'),
+                  subtitle: isEditing
+                      ? TextFormField(
+                          controller: lastNameController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your last name',
+                          ),
+                        )
+                      : Text(lastNameController
+                          .text), // Display the saved last name
+                ),
+                ListTile(
+                  title: Text('Email:'),
+                  subtitle: isEditing
+                      ? TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your email',
+                          ),
+                        )
+                      : Text(emailController.text), // Display the saved email
+                ),
+                ListTile(
+                  title: Text('Phone Number:'),
+                  subtitle: isEditing
+                      ? TextFormField(
+                          controller: phoneNumberController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your phone number (000-000-0000)',
+                          ),
+                        )
+                      : Text(phoneNumberController
+                          .text), // Display the saved phone number
+                ),
               ],
             ),
           ),
-          buildEditableField('First Name', firstNameController, Icons.person),
-          buildEditableField('Last Name', lastNameController, Icons.person),
-          buildEditableField('Email', emailController, Icons.email),
-          buildEditableField(
-              'Phone Number', phoneNumberController, Icons.phone),
+          SizedBox(height: 20),
         ],
       ),
-    );
-  }
-
-  Widget buildEditableField(
-      String title, TextEditingController controller, IconData icon) {
-    return ListTile(
-      title: Text(title),
-      subtitle: isEditing
-          ? TextFormField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: 'Enter $title',
-              ),
-            )
-          : Text(controller.text),
     );
   }
 }
