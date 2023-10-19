@@ -3,6 +3,7 @@ import 'package:mindlift_flutter/conversation_history_screen.dart';
 import 'constants.dart';
 import 'settings_screen.dart';
 import 'chat_screen.dart';
+import 'login_screen.dart';
 
 
 void main() {
@@ -128,6 +129,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: Text('Go to Conversation History'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text('Go to Login'),
             ),
           ],
         ),
