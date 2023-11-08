@@ -3,7 +3,7 @@ import 'package:mindlift_flutter/chat_screen.dart';
 import 'package:mindlift_flutter/conversation_history_screen.dart';
 import 'package:mindlift_flutter/emotion_history.dart';
 import 'package:mindlift_flutter/goals_screen.dart';
-import 'package:mindlift_flutter/login_screen.dart';
+import 'package:mindlift_flutter/logins_screen.dart';
 import 'package:mindlift_flutter/settings.dart';
 import 'common.dart';
 import 'password_reset_page.dart';
@@ -22,7 +22,7 @@ class SettingsDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return LoginScreen();
+                    return LoginsScreen();
                   },
                 ),
               );
