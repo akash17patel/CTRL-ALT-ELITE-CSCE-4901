@@ -8,6 +8,7 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
+  ImagePicker _imagePicker = ImagePicker();
   File? _image;
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
@@ -24,8 +25,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
     super.dispose();
   }
 
-  Future _getImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().getImage(source: source);
+  Future<void> _getImage(ImageSource source) async {
+    final XFile? pickedFile = await _imagePicker.pickImage(
+        source: source); // Use the correct method pickImage
 
     if (pickedFile != null) {
       setState(() {
