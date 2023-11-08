@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindlift_flutter/utils/config.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -14,7 +15,9 @@ class _SplashScreenState extends State<SplashScreen> {
         body: SafeArea(
             child: Center(
                 child: Image(
-      child: AssetImage(Config.app_icon),
+      image: AssetImage(Config.app_icon),
+      height: 80,
+      width: 80,
     ))));
   }
 }
