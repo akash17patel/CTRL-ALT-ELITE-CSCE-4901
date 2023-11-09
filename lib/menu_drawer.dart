@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mindlift_flutter/goals_screen.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:mindlift_flutter/logins_screen.dart';
+=======
+>>>>>>> parent of cfe805b (update screens)
 =======
 >>>>>>> parent of cfe805b (update screens)
 import 'package:mindlift_flutter/settings.dart';
@@ -17,6 +20,7 @@ class SettingsDrawer extends StatelessWidget {
         children: <Widget>[
           buildDrawerHeader('Menu'),
           ListTile(
+<<<<<<< HEAD
 <<<<<<< HEAD
             title: Text('Login'),
             onTap: () {
@@ -42,6 +46,8 @@ class SettingsDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+=======
+>>>>>>> parent of cfe805b (update screens)
 =======
 >>>>>>> parent of cfe805b (update screens)
             title: Text('My Goals'),
