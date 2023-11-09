@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mindlift_flutter/chat_screen.dart';
-import 'package:mindlift_flutter/conversation_history_screen.dart';
-import 'package:mindlift_flutter/emotion_history.dart';
 import 'package:mindlift_flutter/goals_screen.dart';
+<<<<<<< HEAD
 import 'package:mindlift_flutter/logins_screen.dart';
+=======
+>>>>>>> parent of cfe805b (update screens)
 import 'package:mindlift_flutter/settings.dart';
 import 'common.dart';
 import 'password_reset_page.dart';
@@ -17,6 +17,7 @@ class SettingsDrawer extends StatelessWidget {
         children: <Widget>[
           buildDrawerHeader('Menu'),
           ListTile(
+<<<<<<< HEAD
             title: Text('Login'),
             onTap: () {
               Navigator.of(context).push(
@@ -41,6 +42,8 @@ class SettingsDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+=======
+>>>>>>> parent of cfe805b (update screens)
             title: Text('My Goals'),
             onTap: () {
               Navigator.of(context).push(
@@ -59,30 +62,6 @@ class SettingsDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return MyProfilePage();
-                  },
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Conversation History'),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ConversationHistoryScreen();
-                  },
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Emotion History'),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return EmotionHistory();
                   },
                 ),
               );
