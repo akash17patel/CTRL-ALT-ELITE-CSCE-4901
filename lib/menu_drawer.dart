@@ -4,6 +4,7 @@ import 'package:mindlift_flutter/conversation_history_screen.dart';
 import 'package:mindlift_flutter/emotion_history.dart';
 import 'package:mindlift_flutter/goals_screen.dart';
 import 'package:mindlift_flutter/login_screen.dart';
+import 'package:mindlift_flutter/SignupScreen.dart'; // Import the SignupScreen
 import 'package:mindlift_flutter/settings.dart';
 import 'common.dart';
 import 'password_reset_page.dart';
@@ -23,6 +24,18 @@ class SettingsDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return LoginScreen();
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Signup'), // Add the Signup option
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return SignupScreen();
                   },
                 ),
               );
