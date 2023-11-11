@@ -25,24 +25,27 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleEmailPasswordSignIn() async {
-    try {
-      // Removed Firebase authentication code
+  try {
+    // Removed Firebase authentication code
 
-      // Store user information in the local database
-      String hashedPassword = _databaseHelper.hashPassword(_passwordController.text);
+    // Retrieve stored credentials
+    Map<String, dynamic>? storedCredentials = await _databaseHelper.retrieveCredentials(_usernameController.text);
 
-      await _databaseHelper.storeCredentials(
-        _usernameController.text,
-        hashedPassword,
-      );
-
+    if (storedCredentials != null &&
+        storedCredentials['password'] == _databaseHelper.hashPassword(_passwordController.text)) {
+      // Passwords match
       // Navigate to the next screen or perform further actions
-      print("Logged into this email address: ${_usernameController.text}");
-    } catch (e) {
-      // Handle local email/password login errors
-      print("Error during local email/password login: $e");
+      print("Logged in successfully");
+    } else {
+      // Handle incorrect credentials
+      print("Error: Incorrect username or password");
     }
+  } catch (e) {
+    // Handle local email/password login errors
+    print("Error during local email/password login: $e");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
