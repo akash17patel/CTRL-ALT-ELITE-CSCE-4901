@@ -1,11 +1,9 @@
 // login_screen.dart
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
-//import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-//import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-//import 'common.dart';
+import 'package:mindlift_flutter/home_screen.dart';
+import 'package:mindlift_flutter/my_profile_page.dart';
+import 'database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,105 +11,162 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _rememberMeController = TextEditingController();
+  final _dbHelper = DatabaseHelper.instance;
 
-  Future<User?> _handleGoogleSignIn() async {
-    try {
-      // Trigger the Google Sign-In process
-      GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+  bool _rememberMe = false;
 
-      if (googleUser == null) {
-        // User canceled the sign-in process
-        return null;
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberMeStatus();
+  }
+
+  void _loadRememberMeStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('rememberMe') ?? false;
+    });
+
+    if (_rememberMe) {
+      // If "Remember Me" is checked, load saved username
+      String? savedUsername = prefs.getString('savedUsername');
+      if (savedUsername != null) {
+        _usernameController.text = savedUsername;
       }
-
-      // Obtain GoogleSignInAuthentication object
-      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // Create Firebase credentials using GoogleSignInAuthentication
-      AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Sign in to Firebase with Google credentials
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-
-      // Ensure the user is verified
-      if (userCredential.user != null && userCredential.user!.email != null) {
-        // User successfully signed in with Google
-        // Navigate to the next screen or perform further actions
-        print("Logged into this email address: ${userCredential.user!.email}");
-        return userCredential.user;
-      } else {
-        // User not verified or email not available
-        // Handle authentication failure
-        print("Error: User not verified or email not available");
-        return null;
-      }
-    } catch (e) {
-      // Handle sign-in errors
-      print("Error during Google Sign-In: $e");
-      return null;
     }
   }
 
-  Future<void> _handleEmailPasswordSignIn() async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _usernameController.text,
-        password: _passwordController.text,
-      );
+  // To use the db helper to store information
+  void _createAccount() async {
+    final username = _usernameController.text;
+    final password = _passwordController.text;
 
-      // Handle local email/password login success, navigate to the next screen, etc.
-    } catch (e) {
-      // Handle local email/password login errors
-      print("Error during local email/password login: $e");
+    if (username.isEmpty || password.isEmpty) {
+      _showMessage('Username and password cannot be empty');
+      return;
     }
+    // Ideally, add hashing later. This is just for example
+    await _dbHelper.storeCredentials(username, password);
+    _showMessage('Account Successfully Created!');
+  }
+
+  // Check that information
+  void _login() async {
+    final username = _usernameController.text;
+    final enteredPassword = _passwordController.text;
+
+    if (username.isEmpty || enteredPassword.isEmpty) {
+      _showMessage('Username and password cannot be empty');
+      return;
+    }
+
+    if (_rememberMe) {
+      // If "Remember Me" is checked, save username to local storage
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('rememberMe', true);
+      prefs.setString('savedUsername', username);
+      MyProfilePage.username = username;
+    } else {
+      // If "Remember Me" is not checked, clear saved username
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('rememberMe', false);
+      prefs.remove('savedUsername');
+    }
+
+    final credentials = await _dbHelper.retrieveCredentials(username);
+    if (credentials != null) {
+      final storedHashedPassword = credentials['password'];
+
+      // Hash the entered password for comparison
+      final enteredHashedPassword = _dbHelper.hashPassword(enteredPassword);
+
+      if (storedHashedPassword == enteredHashedPassword) {
+        _showMessage('Login Success');
+
+        // Set the username in MyProfilePage
+        MyProfilePage.username = username;
+
+        //Navigate to home screen:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen(title: 'Login')),
+        );
+      } else {
+        _showMessage('Invalid Password!');
+      }
+    } else {
+      _showMessage('Invalid Username!');
+    }
+  }
+
+  // To implement the message
+  void _showMessage(String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  @override // Flutter stuff to show stuff
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text('Login')),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _rememberMe,
+                    onChanged: (value) {
+                      setState(() {
+                        _rememberMe = value!;
+                      });
+                    },
+                  ),
+                  Text('Remember Me'),
+                ],
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _login,
+                    child: Text('Login'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _createAccount,
+                    child: Text('Create Account'),
+                  ),
+                ],
+              ),
+            ])));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SignInButton(
-              Buttons.Google,
-              onPressed: () async {
-                User? user = await _handleGoogleSignIn();
-                if (user != null) {
-                  // User successfully signed in with Google
-                  // Navigate to the next screen or perform further actions
-                } else {
-                  // Handle sign-in cancellation or failure
-                }
-              },
-            ),
-            TextFormField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              onPressed: () => _handleEmailPasswordSignIn(),
-              child: Text('Login with Email and Password'),
-            ),
-          ],
-        ),
-      ),
-    );
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

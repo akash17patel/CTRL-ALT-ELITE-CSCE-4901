@@ -3,22 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfilePage extends StatefulWidget {
+  static String? username;
   @override
   _MyProfilePageState createState() => _MyProfilePageState();
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
   File? _image;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController lastNameController = TextEditingController();
+  //TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   bool isEditing = false; // Track editing mode
 
   @override
   void dispose() {
-    nameController.dispose();
-    lastNameController.dispose();
+    //usernameController.dispose();
     emailController.dispose();
     phoneNumberController.dispose();
     super.dispose();
@@ -140,27 +139,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 SizedBox(height: 20),
                 ListTile(
-                  title: Text('Name:'),
-                  subtitle: isEditing
-                      ? TextFormField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your name',
-                          ),
-                        )
-                      : Text(nameController.text), // Display the saved name
-                ),
-                ListTile(
-                  title: Text('Last Name:'),
-                  subtitle: isEditing
-                      ? TextFormField(
-                          controller: lastNameController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your last name',
-                          ),
-                        )
-                      : Text(lastNameController
-                          .text), // Display the saved last name
+                  title: Text('Username:'),
+                  subtitle: Text(
+                      MyProfilePage.username ?? ''), // Display the saved name
                 ),
                 ListTile(
                   title: Text('Email:'),

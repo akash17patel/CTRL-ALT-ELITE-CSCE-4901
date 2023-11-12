@@ -15,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  bool isUserLoggedIn = false; //Track if user is logged
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -45,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         endDrawer: SettingsDrawer(),
         body: TabBarView(
           children: [
-            HomeTab(),
+            HomeTab(isUserLoggedIn: isUserLoggedIn),
             SettingsTab(),
           ],
         ),
