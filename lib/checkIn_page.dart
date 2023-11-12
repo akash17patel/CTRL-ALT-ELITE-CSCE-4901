@@ -41,11 +41,11 @@ class _CheckInPageState extends State<CheckInPage> {
               });
               
             },
-            child: Container(height:60,width:200,color: Colors.grey, child:Center(child: Text('Emotion Selection')))),
-           SizedBox(height: 15,),
+            child: Container(height:60,width:200,color: Colors.grey, child:const Center(child: Text('Emotion Selection')))),
+           const SizedBox(height: 15,),
            
-          isEmotionOpened == true? TextField():SizedBox(),
-           SizedBox(height: 15,),
+          isEmotionOpened == true? const TextField():const SizedBox(),
+           const SizedBox(height: 15,),
         
            GestureDetector(
             onTap: () {
@@ -56,26 +56,26 @@ class _CheckInPageState extends State<CheckInPage> {
               });
               
             },
-            child: Container(height:60,width:200,color: Colors.grey, child:Center(child: Text('Notes/Comments')))),
-            SizedBox(height: 15,),
+            child: Container(height:60,width:200,color: Colors.grey, child:const Center(child: Text('Notes/Comments')))),
+            const SizedBox(height: 15,),
            
-          isNotesOpened == true? TextField():SizedBox(),
-           SizedBox(height: 50,),
+          isNotesOpened == true? const TextField():const SizedBox(),
+           const SizedBox(height: 50,),
         
            InkWell(
             onTap: () {
               showDialog(context: context, builder: (context){
-                return AlertDialog(title: Text('Are You Sure?'),content: Column(
+                return AlertDialog(title: const Text('Are You Sure?'),content: Column(
                   mainAxisSize: MainAxisSize.min,
                   
                   children: [
-                  ElevatedButton(onPressed: (){}, child: Text('Yes')),
-                   ElevatedButton(onPressed: (){}, child: Text('No')),
+                  ElevatedButton(onPressed: (){}, child: const Text('Yes')),
+                   ElevatedButton(onPressed: (){}, child: const Text('No')),
                 ]),);
               });
             },
             
-            child: Container(height:60,width:200,color: Colors.red, child:Center(child: Text('Confirm'))))
+            child: Container(height:60,width:200,color: Colors.red, child:const Center(child: Text('Confirm'))))
         
           
           ],),
