@@ -1,16 +1,134 @@
 import 'package:flutter/material.dart';
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends StatefulWidget {
   final bool isUserLoggedIn;
 
   HomeTab({required this.isUserLoggedIn});
 
   @override
+  _HomeTabState createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
+  TextEditingController _textEditingController = TextEditingController();
+  List<ChatMessage> _messages = [];
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Home Tab Content',
+    super.build(context); // Ensure that super.build is called
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat Screen'), // Set your desired title here
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListView.builder(
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: _messages[index].isUser
+                        ? _buildUserMessage(_messages[index].text)
+                        : _buildAiMessage(_messages[index].text),
+                  );
+                },
+              ),
+            ),
+          ),
+          _buildInputField(),
+        ],
       ),
     );
   }
+
+  Widget _buildUserMessage(String text) {
+    return Container(
+      padding: EdgeInsets.all(8.0),
+      margin: EdgeInsets.symmetric(vertical: 4.0),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(0, 178, 202, 1.0),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text('$text (User)', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _buildAiMessage(String text) {
+    return Container(
+      padding: EdgeInsets.all(8.0),
+      margin: EdgeInsets.symmetric(vertical: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Text('$text (AI)', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _buildInputField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textEditingController,
+              onSubmitted: _handleSubmitted,
+              decoration: InputDecoration(
+                hintText: 'Type a message...',
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.send),
+            onPressed: () => _handleSubmitted(_textEditingController.text),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleSubmitted(String text) {
+    if (text.isNotEmpty) {
+      _addMessage(text, true); // Add user message
+      // Simulate AI response (replace this with actual AI logic)
+      String aiResponse = _getAiResponse(text);
+      _addMessage(aiResponse, false);
+      _textEditingController.clear(); // Clear the input field
+    }
+  }
+
+  void _addMessage(String text, bool isUser) {
+    setState(() {
+      _messages.add(ChatMessage(text: text, isUser: isUser));
+    });
+  }
+
+  String _getAiResponse(String userMessage) {
+    // Replace this with your AI logic to generate responses based on user input
+    // For simplicity, this example just echoes the user's message.
+    return 'Good and you?';
+  }
+}
+
+class ChatMessage {
+  final String text;
+  final bool isUser;
+
+  ChatMessage({required this.text, required this.isUser});
 }
