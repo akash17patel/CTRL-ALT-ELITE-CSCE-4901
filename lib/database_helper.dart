@@ -1,7 +1,8 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:crypto/crypto.dart';
 import 'package:path/path.dart';
+import 'dart:convert';
 
-// We really only need 1 db, singleton to be everywhere
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init(); // Constructor
   static Database? _database;
@@ -17,14 +18,17 @@ class DatabaseHelper {
 
   // Method called to use pre existing db
   Future<Database> _initDB(String filePath) async {
+    print('Initializing database');
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
+    print('Database path: $path');
 
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   // But if we need one, create one
   Future _createDB(Database db, int version) async {
+    print('Creating database');
     await db.execute('''
       CREATE TABLE user_credentials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,15 +38,38 @@ class DatabaseHelper {
     ''');
   }
 
+  String hashPassword(String password) {
+    return _hashPassword(password);
+  }
+
+  // Make the method private within the class
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final hashedPassword = sha256.convert(bytes).toString();
+    return hashedPassword;
+  }
+
   // Store, async
   Future<int> storeCredentials(String username, String password) async {
-    final db = await instance.database;
-    final data = {'username': username, 'password': password};
-    return await db.insert('user_credentials', data);
+    print('Storing credentials for $username');
+    try {
+      final db = await instance.database;
+      final hashedPassword = hashPassword(password);
+      //print('Hashed password: $hashedPassword');      //testing purpose
+      final data = {'username': username, 'password': hashedPassword};
+      final result = await db.insert('user_credentials', data);
+      //return await db.insert('user_credentials', data);
+
+      return result;
+    } catch (e) {
+      print('Error storing credentials: $e');
+      return -1; // Return a value that indicates an error
+    }
   }
 
   // Fetch, async
   Future<Map<String, dynamic>?> retrieveCredentials(String username) async {
+    print('Retrieving credentials for $username');
     final db = await instance.database;
     final List<Map<String, dynamic>> result = await db.query(
       'user_credentials',

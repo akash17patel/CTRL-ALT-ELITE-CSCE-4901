@@ -44,6 +44,11 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera permission is required for image selection.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Library permission is required for image selection.</string>
+
 	<true/>
 </dict>
 </plist>
