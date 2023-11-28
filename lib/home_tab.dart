@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'AI.dart';
 
 class HomeTab extends StatefulWidget {
   final bool isUserLoggedIn;
@@ -35,13 +36,23 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
               child: ListView.builder(
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: _messages[index].isUser
-                        ? _buildUserMessage(_messages[index].text)
-                        : _buildAiMessage(_messages[index].text),
+                  return FutureBuilder<String>(
+                    future: _messages[index].text,
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return ListTile(
+                          title: _messages[index].isUser
+                              ? _buildUserMessage(snapshot.data ?? '')
+                              : _buildAiMessage(snapshot.data ?? ''),
+                        );
+                      } else {
+                        // Show a loading indicator or placeholder while waiting
+                        return CircularProgressIndicator();
+                      }
+                    },
                   );
                 },
-              ),
+              )
             ),
           ),
           _buildInputField(),
@@ -103,31 +114,35 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
     );
   }
 
-  void _handleSubmitted(String text) {
+  void _handleSubmitted(String text) async {
     if (text.isNotEmpty) {
-      _addMessage(text, true); // Add user message
-      // Simulate AI response (replace this with actual AI logic)
-      String aiResponse = _getAiResponse(text);
-      _addMessage(aiResponse, false);
+      _addMessage(Future.value(text), true); // Add user message
+
+      // Await for AI response and then add it to the messages
+      String aiResponse = await _getAiResponse(text);
+      _addMessage(Future.value(aiResponse), false); // Add AI response
+
       _textEditingController.clear(); // Clear the input field
     }
   }
 
-  void _addMessage(String text, bool isUser) {
+
+  void _addMessage(Future<String> text, bool isUser) {
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: isUser));
     });
   }
 
-  String _getAiResponse(String userMessage) {
+  Future<String> _getAiResponse(String userMessage) async {
     // Replace this with your AI logic to generate responses based on user input
     // For simplicity, this example just echoes the user's message.
-    return 'Good and you?';
+    String response = await AI().GetAIResponse(userMessage);
+    return response;
   }
 }
 
 class ChatMessage {
-  final String text;
+  final Future<String> text;
   final bool isUser;
 
   ChatMessage({required this.text, required this.isUser});
