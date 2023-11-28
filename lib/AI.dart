@@ -24,8 +24,6 @@ class AI {
     }
 
     // Prepare the input
-    // This is a simplified version. Depending on your model, you might need
-    // to tokenize the input, pad it, etc.
     final input = await Tokenizer().encode("Hello, I am Bob", modelName: "gpt-2");
 
     var output;
@@ -33,10 +31,8 @@ class AI {
     // Run model inference
     _interpreter!.run(input, output);
 
+    // Process
     final decode = Tokenizer().decode(output, modelName: "gpt-2");
-
-    // Process the output
-    // This is a simplified version.
 
     return decode;
   }

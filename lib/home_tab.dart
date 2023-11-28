@@ -134,8 +134,8 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
   }
 
   Future<String> _getAiResponse(String userMessage) async {
-    // Replace this with your AI logic to generate responses based on user input
-    // For simplicity, this example just echoes the user's message.
+
+    // Future
     String response = await AI().GetAIResponse(userMessage);
     return response;
   }
