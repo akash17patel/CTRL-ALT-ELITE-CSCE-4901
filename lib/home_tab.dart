@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'database_helper.dart';
 
 class HomeTab extends StatefulWidget {
   final bool isUserLoggedIn;
@@ -103,19 +104,51 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
     );
   }
 
-  void _handleSubmitted(String text) {
+  void _handleSubmitted(String text) async {
     if (text.isNotEmpty) {
-      _addMessage(text, true); // Add user message
+      // Add user message to UI
+      _addMessage(text, true);
+
+      // Store user message in the database
+      await DatabaseHelper.instance.storeChatMessage(
+          text, true, DateTime.now().toUtc().toIso8601String());
+
       // Simulate AI response (replace this with actual AI logic)
       String aiResponse = _getAiResponse(text);
+
+      // Add AI message to UI
       _addMessage(aiResponse, false);
+
+      // Store AI message in the database
+      await DatabaseHelper.instance.storeChatMessage(
+          aiResponse, false, DateTime.now().toUtc().toIso8601String());
+
       _textEditingController.clear(); // Clear the input field
     }
   }
 
-  void _addMessage(String text, bool isUser) {
+  void _addMessage(String text, bool isUser) async {
+    final timestamp = DateTime.now().toUtc().toIso8601String();
+
+    final result = await DatabaseHelper.instance.storeChatMessage(
+      text,
+      isUser,
+      timestamp,
+    );
+
+    if (result != -1) {
+      print('Message stored in the database');
+    } else {
+      print('Error storing message in the database');
+    }
+
     setState(() {
-      _messages.add(ChatMessage(text: text, isUser: isUser));
+      _messages.add(ChatMessage(
+        text: text,
+        isUser: isUser,
+        sender: isUser ? 'User' : 'AI',
+        timestamp: timestamp,
+      ));
     });
   }
 
@@ -129,6 +162,13 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
 class ChatMessage {
   final String text;
   final bool isUser;
+  final String sender;
+  final String timestamp;
 
-  ChatMessage({required this.text, required this.isUser});
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    required this.sender,
+    required this.timestamp,
+  });
 }

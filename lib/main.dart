@@ -1,9 +1,13 @@
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.instance.database; // This will initialize the database
+  //await DatabaseHelper.instance.getAllTablesInDataBase();
+
   runApp(MyApp());
 }
 
