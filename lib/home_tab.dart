@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'AI.dart';
+import 'database_helper.dart';
 
 class HomeTab extends StatefulWidget {
   final bool isUserLoggedIn;
@@ -127,15 +128,21 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
 
   void _handleSubmitted(String text) async {
     if (text.isNotEmpty) {
+      DateTime now = DateTime.now();
+      String timestamp = now.toIso8601String(); // Use current time as timestamp
+
       _addMessage(Future.value(text), true); // Add user message
+      await _saveMessageToDb(text, true, timestamp); // Save user message to DB
 
       // Await for AI response and then add it to the messages
       String aiResponse = await _getAiResponse(text);
       _addMessage(Future.value(aiResponse), false); // Add AI response
+      await _saveMessageToDb(aiResponse, false, timestamp); // Save AI response to DB
 
       _textEditingController.clear(); // Clear the input field
     }
   }
+
 
 
   void _addMessage(Future<String> text, bool isUser) {
@@ -150,6 +157,15 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
     String response = await ai.GetAIResponse(userMessage);
     return response;
   }
+
+  Future<void> _saveMessageToDb(String message, bool isUser, String timestamp) async {
+    try {
+      await DatabaseHelper.instance.storeChatMessage(message, isUser, timestamp);
+    } catch (e) {
+      print('Error saving message to database: $e');
+    }
+  }
+
 }
 
 class ChatMessage {
