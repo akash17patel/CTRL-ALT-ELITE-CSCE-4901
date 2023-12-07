@@ -13,6 +13,17 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
   TextEditingController _textEditingController = TextEditingController();
   List<ChatMessage> _messages = [];
+  final AI ai = AI();
+
+  @override
+  void initState() {
+    super.initState();
+    ai.initModel().then((_) {
+      print("AI Model initialized");
+    }).catchError((error) {
+      print("Error initializing AI model: $error");
+    });
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -136,7 +147,7 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
   Future<String> _getAiResponse(String userMessage) async {
 
     // Future
-    String response = await AI().GetAIResponse(userMessage);
+    String response = await ai.GetAIResponse(userMessage);
     return response;
   }
 }

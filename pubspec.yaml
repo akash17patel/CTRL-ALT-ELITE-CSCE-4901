@@ -48,8 +48,15 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   crypto: ^3.0.3
-  tflite_flutter: ^0.10.1
-  flutter_gpt_tokenizer: ^0.1.0
+  sp_ai_simple_bpe_tokenizer: ^0.0.1+1
+
+  # Custom Tflite flutter
+  tflite_flutter:
+    git:
+      url: https://github.com/Stormiths/flutter-tflite.git
+      ref: SelectOperations
+
+
 
 dev_dependencies:
   flutter_test:
@@ -106,8 +113,9 @@ flutter:
         - asset: fonts/Merriweather-Black.ttf
 
   assets:
-    - assets/profileimg/
+    - assets/profileimg/ # Add this file to the project please
     - assets/model.tflite
+    - assets/vocab.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
