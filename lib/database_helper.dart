@@ -4,70 +4,76 @@ import 'package:path/path.dart';
 import 'dart:convert';
 
 class DatabaseHelper {
-  static final DatabaseHelper instance = DatabaseHelper._init(); // Constructor
+  static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
   DatabaseHelper._init();
 
-  // Make a new database if we dont have one, otherwise init the db
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('app.db');
+    _database = await _initDB('ML.db');
     return _database!;
   }
 
-  // Method called to use pre existing db
   Future<Database> _initDB(String filePath) async {
     print('Initializing database');
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
     print('Database path: $path');
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    // Increment the version to trigger table creation
+    return await openDatabase(path, version: 4, onCreate: (db, version) async {
+      await _createDB(db, version);
+    });
   }
 
-  // But if we need one, create one
   Future _createDB(Database db, int version) async {
     print('Creating database');
-    await db.execute('''
-      CREATE TABLE user_credentials (
+    try {
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS user_credentials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         password TEXT NOT NULL
-      )
+      );
+
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        text TEXT NOT NULL,
+        sender TEXT NOT NULL,
+        timestamp TEXT NOT NULL
+      );
     ''');
+    } catch (e) {
+      print('Error creating database: $e');
+      rethrow; // Re-throw the exception to get more details in the console
+    }
   }
 
   String hashPassword(String password) {
     return _hashPassword(password);
   }
 
-  // Make the method private within the class
   String _hashPassword(String password) {
     final bytes = utf8.encode(password);
     final hashedPassword = sha256.convert(bytes).toString();
     return hashedPassword;
   }
 
-  // Store, async
   Future<int> storeCredentials(String username, String password) async {
     print('Storing credentials for $username');
     try {
       final db = await instance.database;
       final hashedPassword = hashPassword(password);
-      //print('Hashed password: $hashedPassword');      //testing purpose
       final data = {'username': username, 'password': hashedPassword};
       final result = await db.insert('user_credentials', data);
-      //return await db.insert('user_credentials', data);
-
       return result;
     } catch (e) {
       print('Error storing credentials: $e');
-      return -1; // Return a value that indicates an error
+      return -1;
     }
   }
 
-  // Fetch, async
   Future<Map<String, dynamic>?> retrieveCredentials(String username) async {
     print('Retrieving credentials for $username');
     final db = await instance.database;
@@ -83,7 +89,47 @@ class DatabaseHelper {
     return null;
   }
 
-  // Clean up and save resources.
+  Future<int> storeChatMessage(
+      String message, bool isUser, String timestamp) async {
+    print('Storing chat message: $message');
+    try {
+      final db = await instance.database;
+      final data = {
+        'text': message,
+        'sender': isUser ? 'User' : 'AI',
+        'timestamp': timestamp,
+      };
+      final result = await db.insert('chat_messages', data);
+      return result;
+    } catch (e) {
+      print('Error storing chat message: $e');
+      return -1;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getChatMessagesForDate(String date) async {
+    final db = await instance.database;
+    return await db.query(
+      'chat_messages',
+      columns: ['text', 'sender', 'timestamp'],
+      where: 'timestamp LIKE ?',
+      whereArgs: ['$date%'],
+    );
+  }
+
+/*
+  // Debug
+  Future<void> getAllTablesInDataBase() async {
+    await DatabaseHelper.instance.getAllTablesInDataBase();
+    final db = await instance.database;
+    List<Map> list = await db
+        .rawQuery('SELECT name FROM sqlite_master WHERE type = "table"');
+
+    for (int i = 0; i < list.length; i++) {
+      print(list[i].values);
+    }
+  }
+*/
   Future close() async {
     final db = await instance.database;
     await db.close();
