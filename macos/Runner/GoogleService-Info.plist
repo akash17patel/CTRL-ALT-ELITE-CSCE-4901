@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAE7S7avfYPBT9Kj-4Le24eggHObMviQug</string>
+	<key>GCM_SENDER_ID</key>
+	<string>962638120483</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.mindliftFlutter.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>mindlift-babe1</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mindlift-babe1.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:962638120483:ios:ba5d5c717bfd4c26b4d396</string>
+</dict>
+</plist>
