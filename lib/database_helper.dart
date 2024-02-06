@@ -16,27 +16,57 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    print('Initializing database');
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    print('Database path: $path');
 
-    // Increment the version to trigger table creation
-    return await openDatabase(path, version: 4, onCreate: (db, version) async {
-      await _createDB(db, version);
-    });
+    // Set the latest database version
+    /*
+    Whenever you change something in the DB, like add tables, remove things etc.
+    You must add it to the upgrade chain if this DB has already been rolled out.
+    Otherwise, the DB wont update, and thus code wont work.
+     */
+    const int latestVersion = 2;
+
+    return await openDatabase(
+      path,
+      version: latestVersion, // Update this for new versions
+      onCreate: _createDB,
+      onUpgrade: _upgradeDB,
+    );
   }
 
   Future _createDB(Database db, int version) async {
-    print('Creating database');
-    try {
-      await db.execute('''
+    print('Created new DB');
+    await _upgradeDB(db, 0, version); // Make a version  zero, then send it through the chain
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    // Implement the update chain logic
+    if (oldVersion < 1) {
+      // Logic to upgrade to version 1
+      await _upgradeToVersion1(db); // User credentials
+    }
+    if (oldVersion < 2) {
+      // Logic to upgrade to version 2
+      await _upgradeToVersion2(db); // Chat messages
+    }
+    print('Update DB to version: $newVersion');
+  }
+
+  Future _upgradeToVersion1(Database db) async {
+    // Create user credentials table
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS user_credentials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         password TEXT NOT NULL
       );
+    ''');
+  }
 
+  Future _upgradeToVersion2(Database db) async {
+    // Create chat messages table
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS chat_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT NOT NULL,
@@ -44,10 +74,6 @@ class DatabaseHelper {
         timestamp TEXT NOT NULL
       );
     ''');
-    } catch (e) {
-      print('Error creating database: $e');
-      rethrow; // Re-throw the exception to get more details in the console
-    }
   }
 
   String hashPassword(String password) {
@@ -100,6 +126,10 @@ class DatabaseHelper {
         'timestamp': timestamp,
       };
       final result = await db.insert('chat_messages', data);
+
+      // Debug print the date
+      //print(timestamp);
+
       return result;
     } catch (e) {
       print('Error storing chat message: $e');
@@ -111,13 +141,12 @@ class DatabaseHelper {
     final db = await instance.database;
     return await db.query(
       'chat_messages',
-      columns: ['text', 'sender', 'timestamp'],
       where: 'timestamp LIKE ?',
-      whereArgs: ['$date%'],
+      whereArgs: ['$date%'], // Matches all timestamps starting with the date
     );
   }
 
-/*
+
   // Debug
   Future<void> getAllTablesInDataBase() async {
     await DatabaseHelper.instance.getAllTablesInDataBase();
@@ -129,7 +158,7 @@ class DatabaseHelper {
       print(list[i].values);
     }
   }
-*/
+
   Future close() async {
     final db = await instance.database;
     await db.close();

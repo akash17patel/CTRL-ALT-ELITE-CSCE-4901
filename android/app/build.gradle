@@ -5,6 +5,12 @@ plugins {
     id "com.google.gms.google-services"
 }
 
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -46,7 +52,7 @@ android {
         applicationId "com.example.mindlift_flutter"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -65,4 +71,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation group: 'org.tensorflow', name: 'tensorflow-lite-select-tf-ops', version: '2.14.0'
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'AI.dart';
 import 'database_helper.dart';
 
 class HomeTab extends StatefulWidget {
@@ -13,6 +14,17 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
   TextEditingController _textEditingController = TextEditingController();
   List<ChatMessage> _messages = [];
+  final AI ai = AI();
+
+  @override
+  void initState() {
+    super.initState();
+    ai.initModel().then((_) {
+      print("AI Model initialized");
+    }).catchError((error) {
+      print("Error initializing AI model: $error");
+    });
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -36,13 +48,23 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
               child: ListView.builder(
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: _messages[index].isUser
-                        ? _buildUserMessage(_messages[index].text)
-                        : _buildAiMessage(_messages[index].text),
+                  return FutureBuilder<String>(
+                    future: _messages[index].text,
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return ListTile(
+                          title: _messages[index].isUser
+                              ? _buildUserMessage(snapshot.data ?? '')
+                              : _buildAiMessage(snapshot.data ?? ''),
+                        );
+                      } else {
+                        // Show a loading indicator or placeholder while waiting
+                        return CircularProgressIndicator();
+                      }
+                    },
                   );
                 },
-              ),
+              )
             ),
           ),
           _buildInputField(),
@@ -106,69 +128,49 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
 
   void _handleSubmitted(String text) async {
     if (text.isNotEmpty) {
-      // Add user message to UI
-      _addMessage(text, true);
+      DateTime now = DateTime.now();
+      String timestamp = now.toIso8601String(); // Use current time as timestamp
 
-      // Store user message in the database
-      await DatabaseHelper.instance.storeChatMessage(
-          text, true, DateTime.now().toUtc().toIso8601String());
+      _addMessage(Future.value(text), true); // Add user message
+      await _saveMessageToDb(text, true, timestamp); // Save user message to DB
 
-      // Simulate AI response (replace this with actual AI logic)
-      String aiResponse = _getAiResponse(text);
-
-      // Add AI message to UI
-      _addMessage(aiResponse, false);
-
-      // Store AI message in the database
-      await DatabaseHelper.instance.storeChatMessage(
-          aiResponse, false, DateTime.now().toUtc().toIso8601String());
+      // Await for AI response and then add it to the messages
+      String aiResponse = await _getAiResponse(text);
+      _addMessage(Future.value(aiResponse), false); // Add AI response
+      await _saveMessageToDb(aiResponse, false, timestamp); // Save AI response to DB
 
       _textEditingController.clear(); // Clear the input field
     }
   }
 
-  void _addMessage(String text, bool isUser) async {
-    final timestamp = DateTime.now().toUtc().toIso8601String();
 
-    final result = await DatabaseHelper.instance.storeChatMessage(
-      text,
-      isUser,
-      timestamp,
-    );
 
-    if (result != -1) {
-      print('Message stored in the database');
-    } else {
-      print('Error storing message in the database');
-    }
-
+  void _addMessage(Future<String> text, bool isUser) {
     setState(() {
-      _messages.add(ChatMessage(
-        text: text,
-        isUser: isUser,
-        sender: isUser ? 'User' : 'AI',
-        timestamp: timestamp,
-      ));
+      _messages.add(ChatMessage(text: text, isUser: isUser));
     });
   }
 
-  String _getAiResponse(String userMessage) {
-    // Replace this with your AI logic to generate responses based on user input
-    // For simplicity, this example just echoes the user's message.
-    return 'Good and you?';
+  Future<String> _getAiResponse(String userMessage) async {
+
+    // Future
+    String response = await ai.GetAIResponse(userMessage);
+    return response;
   }
+
+  Future<void> _saveMessageToDb(String message, bool isUser, String timestamp) async {
+    try {
+      await DatabaseHelper.instance.storeChatMessage(message, isUser, timestamp);
+    } catch (e) {
+      print('Error saving message to database: $e');
+    }
+  }
+
 }
 
 class ChatMessage {
-  final String text;
+  final Future<String> text;
   final bool isUser;
-  final String sender;
-  final String timestamp;
 
-  ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.sender,
-    required this.timestamp,
-  });
+  ChatMessage({required this.text, required this.isUser});
 }
