@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mindlift_flutter/checkIn_page.dart';
 import 'package:mindlift_flutter/screens/signup.dart';
+import 'emergency_contact.dart';
 // import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
