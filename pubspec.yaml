@@ -50,6 +50,8 @@ dependencies:
   path: ^1.8.3
   crypto: ^3.0.3
   sp_ai_simple_bpe_tokenizer: ^0.0.1+1
+  permission_handler: ^10.2.0 # for audio recording
+  flutter_sound: ^9.0.0 # for easier sound grabbing
 
   # Custom Tflite flutter
   tflite_flutter:
@@ -117,6 +119,8 @@ flutter:
     - assets/profileimg/ # Add this file to the project please
     - assets/model.tflite
     - assets/vocab.json
+    - assets/tempaudiomodel.tflite
+    - assets/tempaudioAIlanguage.txt
 
   # To add assets to your application, add an assets section, like this:
   # assets:

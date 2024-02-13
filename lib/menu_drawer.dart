@@ -5,6 +5,7 @@ import 'package:mindlift_flutter/emotion_history.dart';
 import 'package:mindlift_flutter/goals_screen.dart';
 import 'package:mindlift_flutter/login_screen.dart';
 import 'package:mindlift_flutter/settings.dart';
+import 'package:mindlift_flutter/audio_AI.dart';
 import 'common.dart';
 import 'password_reset_page.dart';
 import 'my_profile_page.dart';
@@ -107,6 +108,18 @@ class SettingsDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return SettingsScreen();
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Audio'),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return AudioClassificationScreen(title: '',);
                   },
                 ),
               );
