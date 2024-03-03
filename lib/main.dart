@@ -6,6 +6,8 @@ import 'database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final dbHelper = DatabaseHelper;
+
   await DatabaseHelper.instance.database; // This will initialize the database
   //await DatabaseHelper.instance.getAllTablesInDataBase();
 
