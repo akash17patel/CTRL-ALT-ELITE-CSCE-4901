@@ -55,6 +55,7 @@ dependencies:
   flutter_local_notifications: ^16.3.2
   rxdart: ^0.27.7
 
+
   # Custom Tflite flutter
   tflite_flutter:
     git:
@@ -118,7 +119,6 @@ flutter:
         - asset: fonts/Merriweather-Black.ttf
 
   assets:
-    - assets/profileimg/ # Add this file to the project please
     - assets/model.tflite
     - assets/vocab.json
     - assets/tempaudiomodel.tflite
