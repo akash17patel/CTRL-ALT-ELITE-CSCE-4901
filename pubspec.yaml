@@ -52,6 +52,8 @@ dependencies:
   sp_ai_simple_bpe_tokenizer: ^0.0.1+1
   permission_handler: ^10.2.0 # for audio recording
   flutter_sound: ^9.0.0 # for easier sound grabbing
+  flutter_local_notifications: ^16.3.2
+  rxdart: ^0.27.7
 
   # Custom Tflite flutter
   tflite_flutter:

@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 assets/model.tflite
+windows/flutter/generated_plugins.cmake
+windows/flutter/generated_plugin_registrant.cc
+macos/Flutter/GeneratedPluginRegistrant.swift
+linux/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
