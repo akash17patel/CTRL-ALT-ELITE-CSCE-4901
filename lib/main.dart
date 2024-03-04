@@ -1,14 +1,17 @@
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'home_screen.dart';
 import 'database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final dbHelper = DatabaseHelper;
+
   await DatabaseHelper.instance.database; // This will initialize the database
   //await DatabaseHelper.instance.getAllTablesInDataBase();
 
-  runApp(MyApp());
+  runApp(MyApp()); // Use Splash Screen as the initial screen display
 }
 
 class MyApp extends StatelessWidget {
