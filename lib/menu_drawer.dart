@@ -49,7 +49,7 @@ class SettingsDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return GoalsScreen();
+                    return Goals();
                   },
                 ),
               );

@@ -48,6 +48,9 @@
 	<string>Camera permission is required for image selection.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo Library permission is required for image selection.</string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Microphone access is required for crisis recognition.</string>
+
 
 	<true/>
 </dict>

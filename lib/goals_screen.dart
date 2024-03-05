@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class GoalsScreen extends StatefulWidget {
@@ -101,6 +101,139 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+
+class Goals extends StatefulWidget {
+  @override
+  _GoalsState createState() => _GoalsState();
+}
+
+class _GoalsState extends State<Goals> {
+  List<String> goalCards = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Goals'),
+      ),
+      body: ListView.builder(
+        itemCount: goalCards.length + 1,
+        itemBuilder: (context, index) {
+          if (index == goalCards.length) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  goalCards.add('');
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 8),
+                    Text('Add new goal'),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return GoalCardWidget(
+              text: goalCards[index],
+              onTextChanged: (newText) {
+                setState(() {
+                  goalCards[index] = newText;
+                });
+              },
+              onDelete: () {
+                setState(() {
+                  goalCards.removeAt(index);
+                });
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class GoalCardWidget extends StatefulWidget {
+  final String text;
+  final Function(String) onTextChanged;
+  final VoidCallback onDelete;
+
+  GoalCardWidget({
+    required this.text,
+    required this.onTextChanged,
+    required this.onDelete,
+  });
+
+  @override
+  _GoalCardWidgetState createState() => _GoalCardWidgetState();
+}
+
+class _GoalCardWidgetState extends State<GoalCardWidget> {
+  bool _checked = false;
+  late TextEditingController _editingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _editingController = TextEditingController(text: widget.text);
+  }
+
+  @override
+  void dispose() {
+    _editingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                  value: _checked,
+                  onChanged: (value) {
+                    setState(() {
+                      _checked = value!;
+                    });
+                  },
+                ),
+                Expanded(
+                  child: Text(widget.text),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      // Implement edit functionality here
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: widget.onDelete,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
