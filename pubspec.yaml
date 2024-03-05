@@ -115,8 +115,8 @@ flutter:
         - asset: fonts/Merriweather-Black.ttf
 
   assets:
-    - assets/profileimg/ # Add this file to the project please
-    - assets/model.tflite
+    #- assets/profileimg/ # Add this file to the project please # Where will i get this file?
+    #- assets/model.tflite 
     - assets/vocab.json
 
 flutter_launcher_icons:

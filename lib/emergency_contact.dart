@@ -95,7 +95,7 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showContactForm,
         tooltip: 'Add Emergency Contact',
-        child: Icon(Icons.add),
+        child: Icon(Icons.edit),
       ),
     );
   }
