@@ -1,0 +1,1 @@
+ C:\\Users\\akash\\Documents\\FALL\ 2023\\CSCE\ 4901\ CAPSTONE\ 1\\Fixed\\flutter_application_1\\.dart_tool\\flutter_build\\0dc6a3269163b74cdd39186ee2cefa8f\\native_assets.yaml: 
