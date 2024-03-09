@@ -52,9 +52,12 @@ dependencies:
   crypto: ^3.0.3
   sp_ai_simple_bpe_tokenizer: ^0.0.1+1
 <<<<<<< HEAD
+<<<<<<< HEAD
   permission_handler: ^10.2.0 # for audio recording
   flutter_sound: ^9.3.8 # for easier sound grabbing
   rxdart: ^0.27.7
+=======
+>>>>>>> parent of eba5549 (UPDATE)
 =======
 >>>>>>> parent of eba5549 (UPDATE)
 
