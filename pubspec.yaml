@@ -51,9 +51,12 @@ dependencies:
   path: ^1.8.3
   crypto: ^3.0.3
   sp_ai_simple_bpe_tokenizer: ^0.0.1+1
+<<<<<<< HEAD
   permission_handler: ^10.2.0 # for audio recording
   flutter_sound: ^9.3.8 # for easier sound grabbing
   rxdart: ^0.27.7
+=======
+>>>>>>> parent of eba5549 (UPDATE)
 
   # Custom Tflite flutter
   tflite_flutter:
