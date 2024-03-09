@@ -2,16 +2,15 @@ import 'package:flutter/material.dart'; // Package for building UIs in Flutter
 //import 'db_helper.dart'; // Import database helper class
 
 // Goals widget, a StatelessWidget representing the goals of the application
-class Goals extends StatelessWidget {
+abstract class Goals extends StatelessWidget {
   // final dbHelper = DBHelper(); // Create an instance of database helper
 
-  @override
-//defining method createState inside goals class
+  //defining method createState inside goals class
   _GoalsState createState() =>
       _GoalsState(); //_ indicates that this state class is private to its file
 }
 
-class _GoalsState extends State<MyGoals> {
+class _GoalsState extends State<TextField> {
   List<String> goalCards = []; //initializing list as empty to store goal cards
 
   @override
@@ -150,7 +149,7 @@ class _GoalCardWidgetState extends State<GoalCardWidget> {
                     setState(() {
                       // checking if user is editing the card value/text and assigning text value of _editingController to 'text' property
                       if (_editing) {
-                        widget.text = _editingController.text;
+                        _editingController.text;
                       }
                       _editing =
                           !_editing; // allows switching between editing and viewing state of card
@@ -195,6 +194,6 @@ class _GoalCardWidgetState extends State<GoalCardWidget> {
 
 void main() {
   runApp(MaterialApp(
-    home: MyGoals(),
-  ));
+      //home: Goals(),
+      ));
 }
