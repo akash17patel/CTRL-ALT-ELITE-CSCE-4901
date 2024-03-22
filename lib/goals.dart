@@ -1,3 +1,6 @@
+////////////////////////////////////////
+
+import 'db_helper.dart'; // Import your DBHelper class
 import 'package:flutter/material.dart'; // Package for building UIs in Flutter
 //import 'db_helper.dart'; // Import database helper class
 
@@ -12,6 +15,7 @@ abstract class Goals extends StatelessWidget {
 
 class _GoalsState extends State<TextField> {
   List<String> goalCards = []; //initializing list as empty to store goal cards
+  final TextEditingController _goalController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +42,18 @@ class _GoalsState extends State<TextField> {
             return GestureDetector(
               // Widget that detects gestures e.g tap
               onTap: () {
-                //adds empty string to list of cards for goals
+///////////////////////////----------------added for db
+                // Get the entered goal
+                String goal = _goalController.text.trim();
+                // Call the method to insert data into the database
+                DBHelper().insertData({'goal': goal});
+                // Clear the text field after insertion
+                _goalController.clear();
+
+                //update to show addition of a goal card
                 setState(() {
-                  goalCards.add('');
-                });
+                  goalCards.add(goal);
+                }); /////////////////////////////////
               },
               child: Container(
                 padding:
