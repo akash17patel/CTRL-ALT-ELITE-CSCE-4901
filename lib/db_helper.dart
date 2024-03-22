@@ -50,4 +50,16 @@ class DBHelper {
   }
 
   // edit here(if required) - add methods as needed for any more CRUD operations
+  // Method to delete data from db using index
+  Future<void> deleteDataByIndex(int index) async {
+    Database db = await database; // Get db instance
+    await db.delete(
+      'my_table', // table name  from where we delete data
+      where:
+          'rowid = ?', // // to delete data -  where clause using SQLite rowid
+      whereArgs: [
+        index + 1
+      ], // increment index by 1 because SQLite rowid starts from 1
+    );
+  }
 }

@@ -71,8 +71,13 @@ class _GoalsState extends State<TextField> {
           } else {
             return GoalCardWidget(
               text: goalCards[index],
-              onDelete: () {
-                //allows deletion of cards by users
+              onDelete: () async {
+                ///////////////////////////////
+                // Call the deleteDataByIndex method from DBHelper to delete the goal from the database
+                await DBHelper().deleteDataByIndex(index);
+
+/////////////////////////////////////
+                //updates state of goals i.e does not show deleted cards by users
                 setState(() {
                   //updates state
                   goalCards.removeAt(index);
