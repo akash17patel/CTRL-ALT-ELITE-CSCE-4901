@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'database_helper.dart';
+import 'services/database.dart';
 
 class ConversationHistoryScreen extends StatefulWidget {
   @override
@@ -101,16 +101,18 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
   void _loadChatMessages(DateTime selectedDate) async {
     String formattedDate =
         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-    print("Loading messages for date: $formattedDate"); // Add this line
+    print("Loading messages for date: $formattedDate"); // Debugging line
 
     List<Map<String, dynamic>> chatMessages =
-        await DatabaseHelper.instance.getChatMessagesForDate(formattedDate);
-    print("Retrieved messages: $chatMessages"); // Add this line
+    await MindliftDatabase.instance.getChatMessagesForDate(formattedDate);
+    
+    print("Retrieved messages: $chatMessages"); // Debugging line
 
     setState(() {
       _chatMessages = chatMessages;
     });
   }
+
 }
 
 class ChatMessageWidget extends StatelessWidget {

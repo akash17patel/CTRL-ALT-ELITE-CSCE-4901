@@ -6,10 +6,12 @@ import 'emergency_contact.dart';
 import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'services/database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
+  MindliftDatabase.instance.database; // Initialize the DB
   runApp(MyApp());
 }
 
