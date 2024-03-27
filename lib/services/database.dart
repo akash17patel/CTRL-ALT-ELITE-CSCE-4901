@@ -116,5 +116,52 @@ class MindliftDatabase {
     );
     return messages;
   }
+
+  // Insert the emotion into the db
+  Future<void> insertEmotion(String emotion, DateTime date) async {
+    final db = await database;
+    await db.insert(
+      'EmotionHistory',
+      {
+        'emotion': emotion,
+        'timestamp': date.toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Fetch the emotions on a date
+  Future<List<Map<String, dynamic>>> fetchEmotionsForDate(DateTime date) async {
+    final db = await database;
+    // Manually format the date to 'YYYY-MM-DD' string
+    String dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+    final List<Map<String, dynamic>> emotions = await db.query(
+      'EmotionHistory',
+      where: "strftime('%Y-%m-%d', timestamp) = ?",
+      whereArgs: [dateStr],
+    );
+    return emotions;
+  }
+
+  // Emergency contacts
+
+  // Method to insert a new contact
+  Future<void> insertContact(Map<String, dynamic> contact) async {
+    final db = await database;
+    await db.insert(
+      'EmergencyContacts',
+      contact,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Method to fetch all contacts
+  Future<List<Map<String, dynamic>>> fetchAllContacts() async {
+    final db = await database;
+    return await db.query('EmergencyContacts');
+  }
+
+
 }
 

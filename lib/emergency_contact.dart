@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'services/database.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,11 +28,35 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
   bool isEditing = false;
   int contactsLimit = 5;
 
-  void _addContact(String name, String phoneNumber) {
+  @override
+  void initState() {
+    super.initState();
+    _loadContacts();
+  }
+
+  void _loadContacts() async {
+    List<Map<String, dynamic>> dbContacts = await MindliftDatabase.instance.fetchAllContacts();
+    setState(() {
+      contacts = dbContacts.map<Map<String, String>>((contact) => {
+        'name': contact['name'] as String,
+        'phone': contact['phone'] as String,
+      }).toList();
+    });
+  }
+
+
+  void _addContact(String name, String phoneNumber) async {
     if (contacts.length < contactsLimit) {
-      setState(() {
-        contacts.add({'name': name, 'phoneNumber': phoneNumber});
+      // Format the phone number
+      String formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
+
+      await MindliftDatabase.instance.insertContact({
+        'name': name,
+        'phone': formattedPhoneNumber,
       });
+
+      // Reload contacts to include the new entry
+      _loadContacts();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -45,25 +70,38 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        // Controllers to capture input from text fields
         TextEditingController nameController = TextEditingController();
         TextEditingController phoneNumberController = TextEditingController();
 
         return AlertDialog(
           title: Text('Add Emergency Contact'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-              ),
-              TextField(
-                controller: phoneNumberController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                  ),
+                ),
+                TextField(
+                  controller: phoneNumberController,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
           ),
-          actions: [
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
             TextButton(
               child: Text('Save'),
               onPressed: () {
@@ -75,6 +113,15 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
         );
       },
     );
+  }
+
+  String _formatPhoneNumber(String phoneNumber) {
+    // Basic formatting to match xxx-xxx-xxxx
+    var digits = phoneNumber.replaceAll(RegExp(r'\D'), '');
+    if (digits.length == 10) {
+      return '${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6, 10)}';
+    }
+    return phoneNumber; // Return original if not exactly 10 digits
   }
 
   @override

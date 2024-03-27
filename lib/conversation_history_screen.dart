@@ -105,7 +105,7 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
 
     List<Map<String, dynamic>> chatMessages =
     await MindliftDatabase.instance.getChatMessagesForDate(formattedDate);
-    
+
     print("Retrieved messages: $chatMessages"); // Debugging line
 
     setState(() {
