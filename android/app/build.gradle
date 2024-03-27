@@ -2,13 +2,6 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.gms.google-services"
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-    }
 }
 
 def localProperties = new Properties()
@@ -30,8 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.mindlift_flutter"
-    compileSdkVersion flutter.compileSdkVersion
+    namespace "com.example.mind_lift"
+    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -49,10 +42,10 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.mindlift_flutter"
+        applicationId "com.example.mind_lift"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 26
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -71,6 +64,4 @@ flutter {
     source '../..'
 }
 
-dependencies {
-    implementation group: 'org.tensorflow', name: 'tensorflow-lite-select-tf-ops', version: '2.14.0'
-}
+dependencies {}

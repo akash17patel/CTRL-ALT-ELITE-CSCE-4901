@@ -4,7 +4,8 @@ import 'database_helper.dart';
 
 class ConversationHistoryScreen extends StatefulWidget {
   @override
-  _ConversationHistoryScreenState createState() => _ConversationHistoryScreenState();
+  _ConversationHistoryScreenState createState() =>
+      _ConversationHistoryScreenState();
 }
 
 class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
@@ -29,11 +30,16 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
   }
 
   Widget _buildCalendar() {
+    DateTime now = DateTime.now();
+    DateTime firstDay = DateTime.utc(
+        now.year - 1, now.month, now.day); // Example: Last year from today
+    DateTime lastDay = DateTime.utc(
+        now.year + 1, now.month, now.day); // Example: Next year from today
+
     return Column(
       children: [
         ElevatedButton(
           onPressed: () => setState(() {
-            DateTime now = DateTime.now();
             _focusedDay = DateTime(now.year, now.month, now.day);
             _selectedDay = _focusedDay;
             _loadChatMessages(_selectedDay!);
@@ -41,8 +47,8 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
           child: Text('Today'),
         ),
         TableCalendar(
-          firstDay: DateTime.utc(2023, 1, 1),
-          lastDay: DateTime.utc(2023, 12, 31),
+          firstDay: firstDay,
+          lastDay: lastDay,
           focusedDay: _focusedDay,
           calendarFormat: _calendarFormat,
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -69,6 +75,12 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
   }
 
   Widget _buildChatMessages() {
+    if (_chatMessages.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(), // Show a loading indicator
+      );
+    }
+
     return ListView.builder(
       itemCount: _chatMessages.length,
       itemBuilder: (context, index) {
@@ -87,12 +99,13 @@ class _ConversationHistoryScreenState extends State<ConversationHistoryScreen> {
   }
 
   void _loadChatMessages(DateTime selectedDate) async {
-    String formattedDate = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-    //print("Selected date: $formattedDate"); // Debug print
+    String formattedDate =
+        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+    print("Loading messages for date: $formattedDate"); // Add this line
 
     List<Map<String, dynamic>> chatMessages =
-    await DatabaseHelper.instance.getChatMessagesForDate(formattedDate);
-    //print("Retrieved messages: $chatMessages"); // Debug print
+        await DatabaseHelper.instance.getChatMessagesForDate(formattedDate);
+    print("Retrieved messages: $chatMessages"); // Add this line
 
     setState(() {
       _chatMessages = chatMessages;
