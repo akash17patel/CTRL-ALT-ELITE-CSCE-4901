@@ -39,7 +39,7 @@ class MindliftDatabase {
   // Method to create tables
   Future<void> _onCreate(Database db, int version) async {
     await _createTable(db, 'Pincode', 'id INTEGER PRIMARY KEY, pincode TEXT');
-    await _createTable(db, 'ConversationHistory', 'id INTEGER PRIMARY KEY, conversation TEXT, timestamp DATETIME');
+    await _createTable(db, 'ConversationHistory', 'id INTEGER PRIMARY KEY, sender TEXT, text TEXT, timestamp DATETIME');
     await _createTable(db, 'EmotionHistory', 'id INTEGER PRIMARY KEY, emotion TEXT, timestamp DATETIME');
     await _createTable(db, 'EmergencyContacts', 'id INTEGER PRIMARY KEY, name TEXT, phone TEXT');
     await _createTable(db, 'Goals', 'id INTEGER PRIMARY KEY, goal TEXT, dueDate DATETIME');
@@ -104,6 +104,21 @@ class MindliftDatabase {
 
   /****************************************************/
   // Specific methods
+
+  // Add message to DB
+  Future<void> insertChatMessage(String sender, String text, DateTime timestamp) async {
+    // Format the timestamp to a SQLite compatible string
+    String formattedTimestamp = timestamp.toIso8601String();
+
+    // Prepare the data map
+    Map<String, dynamic> data = {
+      'sender': sender,
+      'text': text,
+      'timestamp': formattedTimestamp,
+    };
+
+    await insert('ConversationHistory', data);
+  }
 
   // Method to fetch chat messages for a specific date
   Future<List<Map<String, dynamic>>> getChatMessagesForDate(String date) async {

@@ -7,6 +7,7 @@ import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'services/database.dart';
+import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -158,7 +159,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set the text for the "My Goals" button
-    buttonNames[0] = 'ChatBot';
+    buttonNames[0] = 'Chat';
     buttonNames[1] = 'Conversation History';
     buttonNames[2] = 'My Goals';
     buttonNames[3] = 'Emotion History';
@@ -183,7 +184,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailScreen(index: index + 1),
+                        builder: (context) => ChatScreen(),
                       ),
                     );
                     break;
