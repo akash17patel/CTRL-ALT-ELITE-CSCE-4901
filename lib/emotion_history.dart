@@ -15,6 +15,7 @@ class _EmotionHistoryState extends State<EmotionHistory> {
     super.initState();
     _fetchEmotionsForSelectedDay();
   }
+
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -25,7 +26,9 @@ class _EmotionHistoryState extends State<EmotionHistory> {
     // Create a new DateTime object representing today, with only year, month, and day parts
     DateTime today = DateTime(now.year, now.month, now.day);
     // Ensure _selectedDay is also stripped of any time part
-    DateTime selectedDate = _selectedDay != null ? DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day) : today;
+    DateTime selectedDate = _selectedDay != null
+        ? DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day)
+        : today;
 
     // Now check if the selectedDate is today
     if (selectedDate.isAtSameMomentAs(today)) {
@@ -48,30 +51,36 @@ class _EmotionHistoryState extends State<EmotionHistory> {
 
   Future<bool> _showAddEmotionConfirmationDialog() async {
     return (await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Action'),
-        content: Text('Are you sure you want to add an emotion to a different day?'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(false), // Return false on cancel
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Confirm Action'),
+            content: Text(
+                'Are you sure you want to add an emotion to a different day?'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () =>
+                    Navigator.of(context).pop(false), // Return false on cancel
+              ),
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(context)
+                    .pop(true), // Return true on confirmation
+              ),
+            ],
           ),
-          TextButton(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(true), // Return true on confirmation
-          ),
-        ],
-      ),
-    )) ?? false; // Return false if the dialog is dismissed
+        )) ??
+        false; // Return false if the dialog is dismissed
   }
-
-
 
   void _fetchEmotionsForSelectedDay() async {
     if (_selectedDay != null) {
-      List<Map<String, dynamic>> fetchedEmotions = await MindliftDatabase.instance.fetchEmotionsForDate(_selectedDay!);
-      List<String> emotionList = fetchedEmotions.map((record) => '${record['emotion']} - ${record['timestamp'].split('T')[0]}').toList();
+      List<Map<String, dynamic>> fetchedEmotions =
+          await MindliftDatabase.instance.fetchEmotionsForDate(_selectedDay!);
+      List<String> emotionList = fetchedEmotions
+          .map((record) =>
+              '${record['emotion']} - ${record['timestamp'].split('T')[0]}')
+          .toList();
 
       setState(() {
         _emotionHistory = emotionList;
@@ -81,14 +90,18 @@ class _EmotionHistoryState extends State<EmotionHistory> {
 
   @override
   Widget build(BuildContext context) {
+    final DateTime today = DateTime.now();
+    final DateTime lastSelectableDay = today;
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Emotion History'),
-        ),
-        body: Column(children: [
+      appBar: AppBar(
+        title: Text('Emotion History'),
+      ),
+      body: Column(
+        children: [
           TableCalendar(
-            firstDay: DateTime.now().subtract(Duration(days: 3000)),
-            lastDay: DateTime.now().add(Duration(days: 3000)),
+            firstDay: today.subtract(Duration(days: 3000)),
+            lastDay: lastSelectableDay,
             calendarFormat: _calendarFormat,
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) {
@@ -103,11 +116,11 @@ class _EmotionHistoryState extends State<EmotionHistory> {
             },
             calendarStyle: CalendarStyle(
               todayDecoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color.fromARGB(255, 80, 193, 0),
                 shape: BoxShape.circle,
               ),
               selectedDecoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color.fromARGB(255, 119, 0, 255),
                 shape: BoxShape.circle,
               ),
             ),
@@ -129,95 +142,98 @@ class _EmotionHistoryState extends State<EmotionHistory> {
           Padding(
             padding: EdgeInsets.only(bottom: 50),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _onEmotionSelected('😞');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.orange,
-                      ),
-                      child: Icon(
-                        Icons.sentiment_very_satisfied,
-                        color: Colors.white,
-                      ),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _onEmotionSelected('😃');
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_very_satisfied,
+                      color: Colors.white,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _onEmotionSelected('😃');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.green,
-                      ),
-                      child: Icon(
-                        Icons.sentiment_very_satisfied,
-                        color: Colors.white,
-                      ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _onEmotionSelected('😊');
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.green,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_very_satisfied,
+                      color: Colors.white,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _onEmotionSelected('😐');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.yellow,
-                      ),
-                      child: Icon(
-                        Icons.sentiment_neutral,
-                        color: Colors.white,
-                      ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _onEmotionSelected('😐');
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.yellow,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_neutral,
+                      color: Colors.white,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _onEmotionSelected('😞');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.orange,
-                      ),
-                      child: Icon(
-                        Icons.sentiment_dissatisfied,
-                        color: Colors.white,
-                      ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _onEmotionSelected('😟');
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_dissatisfied,
+                      color: Colors.white,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _onEmotionSelected('😞');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.orange,
-                      ),
-                      child: Icon(
-                        Icons.sentiment_very_dissatisfied_rounded,
-                        color: Colors.white,
-                      ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _onEmotionSelected('😞');
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_very_dissatisfied_rounded,
+                      color: Colors.white,
                     ),
                   ),
-                ]),
-          )
-        ]));
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

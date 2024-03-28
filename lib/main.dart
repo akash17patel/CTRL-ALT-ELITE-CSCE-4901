@@ -268,22 +268,3 @@ class SettingsPage extends StatelessWidget {
     );
   }
 }
-
-// Example detail screen widget. REMOVE IT AFTER PAGES IMPLEMENTATION
-class DetailScreen extends StatelessWidget {
-  final int index;
-
-  DetailScreen({required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detail Screen'),
-      ),
-      body: Center(
-        child: Text('You pressed Button $index'),
-      ),
-    );
-  }
-}
