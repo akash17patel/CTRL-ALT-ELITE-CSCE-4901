@@ -125,8 +125,9 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
     }
     return phoneNumber; // Return original if not exactly 10 digits
   }
-    //delete the contact
-    void _deleteContact(int index) async {
+
+  //delete the contact
+  void _deleteContact(int index) async {
     await MindliftDatabase.instance.deleteContact(contacts[index]['phone']);
     _loadContacts();
   }
@@ -145,7 +146,8 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
             subtitle: Text(contacts[index]['phoneNumber'] ?? ''),
             trailing: IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {     //deletes contact when delete icon is pressed
+              onPressed: () {
+                //deletes contact when delete icon is pressed
                 _deleteContact(index);
               },
             ),
@@ -160,4 +162,3 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
     );
   }
 }
- 
