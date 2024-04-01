@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'services/database.dart';
+import 'services/AIClassifier.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,6 +21,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> messages = [];
 
   @override
@@ -36,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // Create a new mutable list from the fetched data
       messages = List<Map<String, dynamic>>.from(todaysMessages);
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom(delayed: true));
   }
 
   void _sendMessage(String text) {
@@ -52,14 +55,14 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       messages.add(message);
     });
+    _scrollToBottom(delayed: true); // Add this line
 
     _controller.clear();
     _simulateAIMessage(text);
   }
 
-  void _simulateAIMessage(String userMessage) {
-    // Placeholder for AI logic
-    String aiResponse = getAIResponse(userMessage);
+  void _simulateAIMessage(String userMessage) async {
+    String aiResponse = await getAIResponse(userMessage);
 
     final aiMessage = {
       'sender': 'AI',
@@ -70,12 +73,27 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       messages.add(aiMessage);
     });
+    _scrollToBottom(delayed: true); // Add this line
   }
 
-  String getAIResponse(String userMessage) {
-    // AI logic stub
-    // For demonstration, simply reverses the user's message
-    return 'AI response to: $userMessage';
+  Future<String> getAIResponse(String userMessage) async {
+    // Send the text to the AI
+    String response = await AIClassifier.instance.getAIResponse(userMessage);
+    print(response);
+    return response;
+  }
+
+  void _scrollToBottom({bool delayed = false}) {
+    final delay = delayed ? Duration(milliseconds: 100) : Duration.zero;
+    Future.delayed(delay, () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -86,6 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final msg = messages[index];

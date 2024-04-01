@@ -24,14 +24,9 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   crypto: ^3.0.3
-  sp_ai_simple_bpe_tokenizer: ^0.0.1+1
   flutter_sound: ^9.2.13 # for easier sound grabbing
   rxdart: ^0.27.7
-
-  #tflite_flutter:
-  #  git:
-  #    url: https://github.com/Stormiths/flutter-tflite.git
-  #    ref: SelectOperations
+  tflite_flutter: ^0.10.4
 
 dev_dependencies:
   flutter_test:
@@ -46,6 +41,8 @@ flutter:
   assets:
     - assets/purplebg.jpg
     - assets/ML.png
+    - assets/model.tflite
+    - assets/vocab.json
 
   fonts:
     - family: Billabong

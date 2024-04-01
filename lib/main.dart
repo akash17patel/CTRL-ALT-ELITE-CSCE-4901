@@ -7,12 +7,14 @@ import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'services/database.dart';
+import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
   MindliftDatabase.instance.database; // Initialize the DB
+  await AIClassifier.instance.initModel(); // Init AI model singleton
   runApp(MyApp());
 }
 
