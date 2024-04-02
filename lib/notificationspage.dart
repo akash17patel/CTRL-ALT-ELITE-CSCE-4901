@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'services/local_notification_service.dart';
+import 'services/NotificationDetailsPage.dart'; // Import the NotificationDetailsPage
 
 class NotificationsPage extends StatelessWidget {
   NotificationsPage({Key? key})
@@ -66,10 +67,11 @@ class NotificationsPage extends StatelessWidget {
     if (payload != null && payload.isNotEmpty) {
       print('payload $payload');
 
-      /*Navigator.push(
+      Navigator.push(
         context,
-        MaterialPageRoute(builder: ((context) => main(payload: payload))),
-      );*/
+        MaterialPageRoute(
+            builder: ((context) => NotificationDetailsPage(payload: payload))),
+      );
     }
   }
 }

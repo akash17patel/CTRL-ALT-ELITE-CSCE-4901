@@ -26,7 +26,7 @@ Future<void> requestPermissions() async {
   await Permission.location.request();
 }
 
-// Uncomment if using notifications
+// Notifications
 Future<void> initializeNotifications() async {
   final localNotificationService = LocalNotificationService();
   await localNotificationService.initialize();
@@ -236,9 +236,18 @@ class HomePage extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromRGBO(255, 255, 255, 0.7)),
                 textStyle: MaterialStateProperty.all<TextStyle>(
                   TextStyle(fontSize: 20),
+                ),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                          60), // Set border radius to 0 for square shape
+                      side: BorderSide(
+                        color: Colors.white,
+                        width: 4,
+                      )),
                 ),
               ),
               child: Center(
@@ -258,14 +267,48 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Example settings page widget
-class SettingsPage extends StatelessWidget {
+////////////////////////////////////////////////////////////////////////////////
+// Settings page widget
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _isDarkMode = false; // Variable to store dark mode state
+
+  ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    primarySwatch: Colors.purple,
+    // Add other light theme colors and styles
+  );
+
+  ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primarySwatch: Colors.grey,
+    // Add other dark theme colors and styles
+  );
+
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        'Settings Page',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Settings Page',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Switch(
+            value: _isDarkMode, // Set initial value
+            onChanged: (value) {
+              setState(() {
+                _isDarkMode = value;
+              });
+              // Apply theme based on switch value (explained later)
+            },
+          ),
+        ],
       ),
     );
   }

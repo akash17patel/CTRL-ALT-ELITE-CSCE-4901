@@ -48,6 +48,10 @@ class MindliftDatabase {
         'id INTEGER PRIMARY KEY, name TEXT, phone TEXT');
     await _createTable(
         db, 'Goals', 'id INTEGER PRIMARY KEY, goal TEXT, dueDate DATETIME');
+
+    // Create a table for settings
+    await _createTable(
+        db, 'Settings', 'id INTEGER PRIMARY KEY, key TEXT, value TEXT');
   }
 
   // Generic method to create a table
@@ -193,5 +197,27 @@ class MindliftDatabase {
       where: 'phone = ?',
       whereArgs: [phoneNumber],
     );
+  }
+
+  // Method to set the darkMode value
+  Future<void> setDarkMode(bool isDarkMode) async {
+    final db = await database;
+    await db.insert(
+      'Settings',
+      {'key': 'darkMode', 'value': isDarkMode ? '1' : '0'},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+// Method to get the darkMode value
+  Future<bool> getDarkMode() async {
+    final db = await database;
+    List<Map<String, dynamic>> results =
+        await db.query('Settings', where: 'key = ?', whereArgs: ['darkMode']);
+    if (results.isNotEmpty) {
+      return results.first['value'] == '1';
+    } else {
+      return false; // Default value if not found
+    }
   }
 }
