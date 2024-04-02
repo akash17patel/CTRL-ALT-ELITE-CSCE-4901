@@ -21,7 +21,8 @@ import 'package:path/path.dart';
 
 class MindliftDatabase {
   MindliftDatabase._privateConstructor(); // Private constructor for the singleton
-  static final MindliftDatabase instance = MindliftDatabase._privateConstructor();
+  static final MindliftDatabase instance =
+      MindliftDatabase._privateConstructor();
 
   static Database? _database;
 
@@ -39,14 +40,19 @@ class MindliftDatabase {
   // Method to create tables
   Future<void> _onCreate(Database db, int version) async {
     await _createTable(db, 'Pincode', 'id INTEGER PRIMARY KEY, pincode TEXT');
-    await _createTable(db, 'ConversationHistory', 'id INTEGER PRIMARY KEY, sender TEXT, text TEXT, timestamp DATETIME');
-    await _createTable(db, 'EmotionHistory', 'id INTEGER PRIMARY KEY, emotion TEXT, timestamp DATETIME');
-    await _createTable(db, 'EmergencyContacts', 'id INTEGER PRIMARY KEY, name TEXT, phone TEXT');
-    await _createTable(db, 'Goals', 'id INTEGER PRIMARY KEY, goal TEXT, dueDate DATETIME');
+    await _createTable(db, 'ConversationHistory',
+        'id INTEGER PRIMARY KEY, sender TEXT, text TEXT, timestamp DATETIME');
+    await _createTable(db, 'EmotionHistory',
+        'id INTEGER PRIMARY KEY, emotion TEXT, timestamp DATETIME');
+    await _createTable(db, 'EmergencyContacts',
+        'id INTEGER PRIMARY KEY, name TEXT, phone TEXT');
+    await _createTable(
+        db, 'Goals', 'id INTEGER PRIMARY KEY, goal TEXT, dueDate DATETIME');
   }
 
   // Generic method to create a table
-  Future<void> _createTable(Database db, String tableName, String fields) async {
+  Future<void> _createTable(
+      Database db, String tableName, String fields) async {
     await db.execute('CREATE TABLE $tableName ($fields)');
   }
 
@@ -106,7 +112,8 @@ class MindliftDatabase {
   // Specific methods
 
   // Add message to DB
-  Future<void> insertChatMessage(String sender, String text, DateTime timestamp) async {
+  Future<void> insertChatMessage(
+      String sender, String text, DateTime timestamp) async {
     // Format the timestamp to a SQLite compatible string
     String formattedTimestamp = timestamp.toIso8601String();
 
@@ -149,7 +156,8 @@ class MindliftDatabase {
   Future<List<Map<String, dynamic>>> fetchEmotionsForDate(DateTime date) async {
     final db = await database;
     // Manually format the date to 'YYYY-MM-DD' string
-    String dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    String dateStr =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
     final List<Map<String, dynamic>> emotions = await db.query(
       'EmotionHistory',
@@ -177,6 +185,13 @@ class MindliftDatabase {
     return await db.query('EmergencyContacts');
   }
 
-
+  // Method to delete a contact by phone number
+  Future<int> deleteContact(String phoneNumber) async {
+    final db = await database;
+    return await db.delete(
+      'EmergencyContacts',
+      where: 'phone = ?',
+      whereArgs: [phoneNumber],
+    );
+  }
 }
-

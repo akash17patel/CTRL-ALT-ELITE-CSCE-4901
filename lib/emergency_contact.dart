@@ -35,21 +35,24 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
   }
 
   void _loadContacts() async {
-    List<Map<String, dynamic>> dbContacts = await MindliftDatabase.instance.fetchAllContacts();
+    List<Map<String, dynamic>> dbContacts =
+        await MindliftDatabase.instance.fetchAllContacts();
     setState(() {
-      contacts = dbContacts.map<Map<String, String>>((contact) => {
-        'name': contact['name'] as String,
-        'phone': contact['phone'] as String,
-      }).toList();
+      contacts = dbContacts
+          .map<Map<String, String>>((contact) => {
+                'name': contact['name'] as String,
+                'phone': contact['phone'] as String,
+              })
+          .toList();
     });
   }
 
-
   void _addContact(String name, String phoneNumber) async {
-    if (contacts.length < contactsLimit) {
-      // Format the phone number
-      String formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
+    // Format the phone number
+    String formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
 
+    if (formattedPhoneNumber.length == 12) {
+      // Check if it's exactly 10 digits
       await MindliftDatabase.instance.insertContact({
         'name': name,
         'phone': formattedPhoneNumber,
@@ -60,7 +63,7 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Maximum contact limit exceeded.'),
+          content: Text('Phone number must be 10 digits.'),
         ),
       );
     }
@@ -119,9 +122,27 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
     // Basic formatting to match xxx-xxx-xxxx
     var digits = phoneNumber.replaceAll(RegExp(r'\D'), '');
     if (digits.length == 10) {
-      return '${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6, 10)}';
+      return '+1-${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6, 10)}';
     }
     return phoneNumber; // Return original if not exactly 10 digits
+  }
+
+  //delete the contact
+  void _deleteContact(int index) async {
+    // Check if the index is within bounds
+    if (index >= 0 && index < contacts.length) {
+      String? phoneNumber = contacts[index]['phone'];
+      if (phoneNumber != null) {
+        await MindliftDatabase.instance.deleteContact(phoneNumber);
+        _loadContacts();
+      } else {
+        // Handle null case, maybe show an error message
+        print('Phone number is null');
+      }
+    } else {
+      // Handle invalid index, maybe show an error message
+      print('Invalid index');
+    }
   }
 
   @override
@@ -135,7 +156,17 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             title: Text(contacts[index]['name'] ?? ''),
-            subtitle: Text(contacts[index]['phoneNumber'] ?? ''),
+            subtitle: Text(
+              contacts[index]['phone'] ?? '',
+              style: TextStyle(color: Colors.purple), // Change color to purple
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                //deletes contact when delete icon is pressed
+                _deleteContact(index);
+              },
+            ),
           );
         },
       ),

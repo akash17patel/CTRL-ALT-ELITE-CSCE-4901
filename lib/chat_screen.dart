@@ -32,13 +32,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _loadTodaysConversations() async {
     String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    List<Map<String, dynamic>> todaysMessages = await MindliftDatabase.instance.getChatMessagesForDate(today);
+    List<Map<String, dynamic>> todaysMessages =
+        await MindliftDatabase.instance.getChatMessagesForDate(today);
 
     setState(() {
       // Create a new mutable list from the fetched data
       messages = List<Map<String, dynamic>>.from(todaysMessages);
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom(delayed: true));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _scrollToBottom(delayed: true));
   }
 
   void _sendMessage(String text) {
@@ -69,7 +71,8 @@ class _ChatScreenState extends State<ChatScreen> {
       'text': aiResponse,
       'timestamp': DateTime.now(),
     };
-    MindliftDatabase.instance.insertChatMessage('User', aiResponse, DateTime.now());
+    MindliftDatabase.instance
+        .insertChatMessage('User', aiResponse, DateTime.now());
     setState(() {
       messages.add(aiMessage);
     });
@@ -112,7 +115,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 return ListTile(
                   title: Text(
                     msg['text'],
-                    style: TextStyle(color: isUserMessage ? Colors.blue : Colors.green),
+                    style: TextStyle(
+                        color: isUserMessage ? Colors.blue : Colors.green),
                   ),
                   subtitle: Text(
                     msg['sender'],
@@ -129,7 +133,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(hintText: 'Type your message here...'),
+                    decoration:
+                        InputDecoration(hintText: 'Type your message here...'),
                   ),
                 ),
                 IconButton(
