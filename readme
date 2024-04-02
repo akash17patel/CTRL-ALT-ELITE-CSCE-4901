@@ -1,3 +1,0 @@
-model.tflite is too large to be uploaded to github
-If encountering errors on build from main not related to model.tflite,
-use branch "Austin"
