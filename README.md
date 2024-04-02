@@ -1,3 +1,10 @@
-# mind_lift
+# Mind_Lift
 
-A new Flutter project.
+Personal Companion App
+Features working:
+  - AI
+  - Conversation History
+  - My Goals
+  - Emotion History
+  - Emergency Contacts
+  - Notifications
