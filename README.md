@@ -1,6 +1,7 @@
 # Mind_Lift
 
 Personal Companion App
+
 Features working:
   - AI
   - Conversation History
