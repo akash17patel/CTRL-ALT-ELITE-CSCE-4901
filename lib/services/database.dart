@@ -199,7 +199,38 @@ class MindliftDatabase {
     );
   }
 
-  // Method to set the darkMode value
+  // Method to set the pincode
+  Future<void> setPincode(String pincode) async {
+    final db = await database;
+    await db.insert(
+      'Pincode',
+      {'id': 1, 'pincode': pincode},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<String?> getPincode() async {
+    final db = await database;
+    List<Map<String, dynamic>> results =
+        await db.query('Pincode', where: 'id = ?', whereArgs: [1]);
+    if (results.isNotEmpty) {
+      return results.first['pincode'];
+    } else {
+      return null;
+    }
+  }
+
+  // New Method: Verify Pincode
+  Future<bool> verifyPincode(String pincode) async {
+    final db = await database;
+    List<Map<String, dynamic>> results = await db.query(
+      'Pincode',
+      where: 'pincode = ?',
+      whereArgs: [pincode],
+    );
+    return results.isNotEmpty;
+  }
+
   Future<void> setDarkMode(bool isDarkMode) async {
     final db = await database;
     await db.insert(
@@ -209,7 +240,6 @@ class MindliftDatabase {
     );
   }
 
-// Method to get the darkMode value
   Future<bool> getDarkMode() async {
     final db = await database;
     List<Map<String, dynamic>> results =
