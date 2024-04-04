@@ -1,1 +1,3 @@
-# CTRL-ALT-ELITE-CSCE-4901
+# mind_lift
+
+A new Flutter project.

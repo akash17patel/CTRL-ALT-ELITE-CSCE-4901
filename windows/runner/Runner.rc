@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "mindlift_flutter" "\0"
+            VALUE "FileDescription", "mind_lift" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "mindlift_flutter" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "mindlift_flutter.exe" "\0"
-            VALUE "ProductName", "mindlift_flutter" "\0"
+            VALUE "InternalName", "mind_lift" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "mind_lift.exe" "\0"
+            VALUE "ProductName", "mind_lift" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,6 +1,6 @@
 {
-    "name": "mindlift_flutter",
-    "short_name": "mindlift_flutter",
+    "name": "mind_lift",
+    "short_name": "mind_lift",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
