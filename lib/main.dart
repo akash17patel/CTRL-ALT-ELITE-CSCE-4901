@@ -50,53 +50,127 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late String _pincode;
+  String _pincode = '';
+  bool _isPincodeEnabled = false;
+  bool _isNewUser = false;
 
   @override
   void initState() {
     super.initState();
-    _pincode = '';
+    checkPincodeStatus();
   }
 
-  void _onPinChanged(String pin) {
-    _pincode = pin;
+  Future<void> checkPincodeStatus() async {
+    bool isPincodeSet = await MindliftDatabase.instance.getPincode() != null;
+    setState(() {
+      _isPincodeEnabled = isPincodeSet;
+    });
+  }
+
+  void navigateToMainContent() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyAppContent()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Enter PIN Code'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PinCodeInput(
-            onChanged: _onPinChanged,
+    if (_isNewUser) {
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/splash_bg.jpg'),
+              fit: BoxFit.cover,
+            ),
           ),
-        ],
-      ),
-      actions: <Widget>[
-        ElevatedButton(
-          onPressed: () async {
-            bool isValid =
-                await MindliftDatabase.instance.verifyPincode(_pincode);
-            if (isValid) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyAppContent()),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Incorrect PIN Code. Please try again.'),
-                  duration: Duration(seconds: 3),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome to MINDLIFT!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              );
-            }
-          },
-          child: Text('Submit'),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    navigateToMainContent();
+                  },
+                  child: Text('Get Started'),
+                ),
+              ],
+            ),
+          ),
         ),
-      ],
-    );
+      );
+    } else {
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/splash_bg.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isPincodeEnabled)
+                  Text(
+                    'Enter PIN Code',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (_isPincodeEnabled) SizedBox(height: 20),
+                if (_isPincodeEnabled)
+                  PinCodeInput(
+                    onChanged: (pin) {
+                      _pincode = pin;
+                    },
+                  ),
+                if (_isPincodeEnabled) SizedBox(height: 20),
+                if (_isPincodeEnabled)
+                  ElevatedButton(
+                    onPressed: () async {
+                      bool isValid = await MindliftDatabase.instance
+                          .verifyPincode(_pincode);
+                      if (isValid) {
+                        navigateToMainContent();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Incorrect PIN Code. Please try again.'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Submit'),
+                  ),
+                if (!_isPincodeEnabled)
+                  ElevatedButton(
+                    onPressed: () {
+                      navigateToMainContent();
+                    },
+                    child: Text('Continue without PIN'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 
