@@ -24,19 +24,17 @@ class _EmotionHistoryState extends State<EmotionHistory> {
   void _onEmotionSelected(String emotion) async {
     DateTime now = DateTime.now();
     // Create a new DateTime object representing today, with only year, month, and day parts
-
-    //[TODO]
-    //use a bool variable to check ifToday instead of like thisa
-    DateTime today = DateTime(now.year, now.month, now.day);
+   
+    //DateTime today = DateTime(now.year, now.month, now.day);
     
     // Ensure _selectedDay is also stripped of any time part
 
     DateTime selectedDate = _selectedDay != null
         ? DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day, _selectedDay!.hour, _selectedDay!.minute, _selectedDay!.second)
-        : today;        
+        : now;        
 
     // Now check if the selectedDate is today    
-    if (selectedDate.isAtSameMomentAs(today)) {
+    if (selectedDate.day == DateTime.now().day) {
       // If the selected date is today, directly add the emotion without showing a prompt
       await MindliftDatabase.instance.insertEmotion(emotion, selectedDate);
     } else {
