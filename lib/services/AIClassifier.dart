@@ -57,10 +57,11 @@ class AIClassifier {
       print('Model run completed.');
 
       int response = processModelOutput(outputTensor);
+      return labelToResponse(response);
       // Debug to look at the raw logits
       //return formatAllLogitsWithLabels(outputTensor);
 
-      return emotionFromResponseInt(response);
+      //return emotionFromResponseInt(response);
 
     } catch (e) {
       print('Error in getAIResponse: $e');
@@ -113,6 +114,102 @@ class AIClassifier {
     print("Predicted class: $predictedClass");
     return predictedClass;
   }
+
+  String labelToResponse(int response) {
+    final math.Random random = math.Random();
+    List<String> responses;
+
+    switch (response) {
+      case 0: // Anger
+        responses = [
+          "I sense some anger. Please tell me more about what is upsetting.",
+          "It's okay to feel angry sometimes. We can keep talking about it if you like.",
+          "It's okay to feel angry sometimes. Want to keep talking about it?",
+          "Anger can be a strong emotion. Do you want to share more about what's causing these feelings?",
+          "I'm here to listen. Can you tell me more about what made you angry?",
+          "It sounds like you're really upset. Would talking about it help you feel better?",
+        ];
+        break;
+      case 1: // Disgust
+        responses = [
+          "That sounds disgusting. Want to talk more about it? What exactly made you feel this way?",
+          "I understand that might be upsetting. Do you want to discuss what triggered this feeling?",
+          "Disgust can be a powerful emotion. Can you share more details about what provoked it?",
+          "It seems something really bothered you. Would you like to delve into what happened?",
+          "Feeling repelled by something can be intense. Do you feel comfortable sharing more about it?",
+          "Sounds like that was really off-putting. What was it that caused such a strong reaction?",
+          "Dealing with disgusting situations is tough. How did that make you feel, and why do you think it affected you so deeply?",
+          "That must have been really unpleasant. Is there anything in particular that you found most repulsive?",
+          "Experiencing something disgusting can leave a mark. How are you coping with these feelings?",
+          "It's natural to feel disgusted by certain things. Do you often find yourself feeling this way, or was this situation unique?",
+        ];
+        break;
+      case 2: // Fear
+        responses = [
+          "Fear can feel overwhelming at times. Can you share what's been scaring you lately?",
+          "It's completely normal to feel afraid. Do you want to talk about what's been on your mind?",
+          "Understanding our fears can help us face them. What do you think is at the root of your fear?",
+          "Fear often tells us about what we deeply care about. Can you tell me more about what you're afraid of losing or facing?",
+          "Sometimes talking about our fears can lessen their hold on us. Would you like to share more about yours?",
+          "Facing our fears is never easy, but it's a brave step. What's one fear you'd like to conquer?",
+          "Everyone has something they're afraid of. How does this particular fear affect your daily life?",
+          "Fear can be a sign of something that needs attention. Is there a specific situation or thought that triggers this feeling for you?",
+          "Acknowledging fear is the first step towards overcoming it. Have you found any strategies that help you deal with it?",
+          "You're not alone in feeling afraid. Would sharing your fears help you feel a bit more relieved?",
+        ];
+        break;
+      case 3: // Joy
+        responses = [
+          "Joy is wonderful! Tell me more about what made you happy.",
+          "That's great to hear! Tell me more about what's bringing you joy.",
+          "That's wonderful to hear!",
+          "Joyful moments are precious. Would you like to share more about this happy experience?",
+          "It sounds like you're having a great time! Can you tell me what's making you feel so joyful?",
+          "Happiness is contagious. What's the secret to your good mood today?",
+          "I love hearing about happy moments. Do you have any other joyful experiences you'd like to share?",
+        ];
+        break;
+      case 4: // Neutral
+        responses = [
+          "Got it. Anything else you'd like to share?",
+          "I'm here to listen. What else is on your mind?",
+          "I see. Anything else on your mind you feel like talking about?",
+          "Got it. Is there something specific you'd like to discuss further?",
+          "Understood. Do any thoughts or feelings stand out to you today?",
+          "Alright. Do you have any plans or ideas you're pondering over?",
+          "Okay. Sometimes it's the small things. Noticed anything interesting lately?",
+        ];
+        break;
+      case 5: // Sadness
+        responses = [
+          "I'm sorry to hear that. Do you want to talk about what's making you sad?",
+          "Feeling sad is okay. I'm here to listen if you want to keep sharing.",
+          "I'm sorry to hear you're feeling down. Want to talk more about what's been happening?",
+          "It's tough going through sad times. Is there a particular event that's been on your mind?",
+          "Feeling sad can be really draining. Do you want to share more about what's making you feel this way?",
+          "Sadness can weigh heavily. Would discussing what's been troubling you help lighten the load?",
+        ];
+        break;
+      case 6: // Surprise
+        responses = [
+          "Surprises can be shocking. What happened?",
+          "Wow, that sounds unexpected. Can you share more details?",
+          "That sounds unexpected! What surprised you exactly?",
+          "Surprises can really throw us off. How did you react?",
+          "Wow, didn't see that coming! Do you want to talk more about it?",
+          "Life is full of surprises. Was this a welcome one for you?",
+          "Surprise can be exciting or shocking. What are your thoughts on what happened?",
+        ];
+        break;
+      default:
+        return "Hmm, I'm not quite sure how to respond to that.";
+    }
+
+    // Select a random response from the chosen list
+    int index = random.nextInt(responses.length);
+    return responses[index];
+  }
+
 
 
   List<List<double>> createPrimaryOutputTensorForBERT() {
@@ -404,7 +501,6 @@ class CharChecker {
         (type >= 58 && type <= 64) ||
         (type >= 91 && type <= 96) ||
         (type >= 123 && type <= 126) ||
-        (type >= 160 && type <= 191) // Latin-1 Punctuation & Symbols
-        ;
+        (type >= 160 && type <= 191);
   }
 }
