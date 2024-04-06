@@ -26,19 +26,160 @@ Future<void> requestPermissions() async {
   await Permission.location.request();
 }
 
-// Notifications
 Future<void> initializeNotifications() async {
   final localNotificationService = LocalNotificationService();
   await localNotificationService.initialize();
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'MINDLIFT',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: SplashScreen(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  // List of pages to display in the BottomNavigationBar
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  String _pincode = '';
+  bool _isPincodeEnabled = false;
+  bool _isNewUser = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkPincodeStatus();
+  }
+
+  Future<void> checkPincodeStatus() async {
+    bool isPincodeSet = await MindliftDatabase.instance.getPincode() != null;
+    setState(() {
+      _isPincodeEnabled = isPincodeSet;
+    });
+  }
+
+  void navigateToMainContent() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyAppContent()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isNewUser) {
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/splash_bg.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome to MINDLIFT!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    navigateToMainContent();
+                  },
+                  child: Text('Get Started'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/splash_bg.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isPincodeEnabled)
+                  Text(
+                    'Enter PIN Code',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (_isPincodeEnabled) SizedBox(height: 20),
+                if (_isPincodeEnabled)
+                  PinCodeInput(
+                    onChanged: (pin) {
+                      _pincode = pin;
+                    },
+                  ),
+                if (_isPincodeEnabled) SizedBox(height: 20),
+                if (_isPincodeEnabled)
+                  ElevatedButton(
+                    onPressed: () async {
+                      bool isValid = await MindliftDatabase.instance
+                          .verifyPincode(_pincode);
+                      if (isValid) {
+                        navigateToMainContent();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Incorrect PIN Code. Please try again.'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Submit'),
+                  ),
+                if (!_isPincodeEnabled)
+                  ElevatedButton(
+                    onPressed: () {
+                      navigateToMainContent();
+                    },
+                    child: Text('Continue without PIN'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
+
+class MyAppContent extends StatefulWidget {
+  @override
+  _MyAppContentState createState() => _MyAppContentState();
+}
+
+class _MyAppContentState extends State<MyAppContent> {
   final List<Widget> _pages = [
     HomePage(),
     SettingsPage(),
@@ -49,86 +190,80 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MINDLIFT',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              Image.asset(
-                'assets/ML.png',
-                height: 70, // Adjust the height as needed
-              ),
-              SizedBox(width: 10), // Add some space between logo and title
-              Text(
-                'MINDLIFT',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontFamily: 'OliveRemaine',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Color.fromARGB(255, 94, 28, 151),
-          toolbarHeight: 100,
-        ),
-        body: Stack(
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/purplebg.jpg'),
-                  fit: BoxFit.cover,
-                ),
+            Image.asset(
+              'assets/ML.png',
+              height: 70, // Adjust the height as needed
+            ),
+            SizedBox(width: 10), // Add some space between logo and title
+            Text(
+              'MINDLIFT',
+              style: TextStyle(
+                fontSize: 30,
+                fontFamily: 'OliveRemaine',
+                fontWeight: FontWeight.bold,
               ),
             ),
-            PageView(
-              controller: _pageController,
-              children: _pages,
-              onPageChanged: (index) {
-                // Set the selected index when the page changes
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-            ),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home,
-                  color: _selectedIndex == 0
-                      ? const Color.fromARGB(255, 119, 0, 255)
-                      : Colors.grey),
-              label: 'Home',
+        backgroundColor: Color.fromARGB(255, 94, 28, 151),
+        toolbarHeight: 100,
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/purplebg.jpg'),
+                fit: BoxFit.cover,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings,
-                  color: _selectedIndex == 1
-                      ? const Color.fromARGB(255, 119, 0, 255)
-                      : Colors.grey),
-              label: 'Settings',
-            ),
-          ],
-          selectedFontSize: 20, // Adjust the selected font size
-          unselectedFontSize: 20, // Adjust the unselected font size
-          selectedIconTheme:
-              IconThemeData(size: 40), // Adjust the selected icon size
-          backgroundColor: Color.fromARGB(
-              255, 255, 255, 255), // Background color of bottom bar
-          elevation: 5, // Shadow elevation of bottom bar
-          type: BottomNavigationBarType.fixed, // Make all items always visible
-          selectedItemColor:
-              Color.fromARGB(255, 119, 0, 255), // Color of selected item
-          unselectedItemColor: Colors.grey, // Color of unselected item
-        ),
+          ),
+          PageView(
+            controller: _pageController,
+            children: _pages,
+            onPageChanged: (index) {
+              // Set the selected index when the page changes
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home,
+                color: _selectedIndex == 0
+                    ? const Color.fromARGB(255, 119, 0, 255)
+                    : Colors.grey),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings,
+                color: _selectedIndex == 1
+                    ? const Color.fromARGB(255, 119, 0, 255)
+                    : Colors.grey),
+            label: 'Settings',
+          ),
+        ],
+        selectedFontSize: 20, // Adjust the selected font size
+        unselectedFontSize: 20, // Adjust the unselected font size
+        selectedIconTheme:
+            IconThemeData(size: 40), // Adjust the selected icon size
+        backgroundColor: Color.fromARGB(
+            255, 255, 255, 255), // Background color of bottom bar
+        elevation: 5, // Shadow elevation of bottom bar
+        type: BottomNavigationBarType.fixed, // Make all items always visible
+        selectedItemColor:
+            Color.fromARGB(255, 119, 0, 255), // Color of selected item
+        unselectedItemColor: Colors.grey, // Color of unselected item
       ),
     );
   }
@@ -267,7 +402,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Settings page widget
 class SettingsPage extends StatefulWidget {
   @override
@@ -276,40 +410,249 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false; // Variable to store dark mode state
+  bool _isPincodeEnabled = false; // Variable to store pincode enabled state
 
-  ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
-    primarySwatch: Colors.purple,
-    // Add other light theme colors and styles
-  );
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
 
-  ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.grey,
-    // Add other dark theme colors and styles
-  );
+  Future<void> _loadSettings() async {
+    bool darkMode = await MindliftDatabase.instance.getDarkMode();
+    bool pincodeEnabled = await MindliftDatabase.instance.getPincode() != null;
+
+    setState(() {
+      _isDarkMode = darkMode;
+      _isPincodeEnabled = pincodeEnabled;
+    });
+  }
+
+  Future<void> _setDarkMode(bool isDarkMode) async {
+    await MindliftDatabase.instance.setDarkMode(isDarkMode);
+    setState(() {
+      _isDarkMode = isDarkMode;
+    });
+  }
+
+  Future<void> _setPincodeEnabled(bool isEnabled) async {
+    if (isEnabled) {
+      // Show Pincode Setup Popup
+      String? pincode = await _showPincodeSetupPopup();
+      if (pincode != null) {
+        await MindliftDatabase.instance.setPincode(pincode);
+        setState(() {
+          _isPincodeEnabled = true;
+        });
+      }
+    } else {
+      // Clear Pincode
+      await MindliftDatabase.instance.delete('Pincode', 1);
+      setState(() {
+        _isPincodeEnabled = false;
+      });
+    }
+  }
+
+  Future<String?> _showPincodeSetupPopup() async {
+    String? pincode;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Set Pincode'),
+          content: TextField(
+            onChanged: (value) {
+              pincode = value;
+            },
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            decoration: InputDecoration(
+              hintText: 'Enter 4-digit Pincode',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(pincode);
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return pincode;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Settings Page',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: EdgeInsets.all(15), // 5 pixels padding from all sides
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.3), // Background color with opacity
+          borderRadius: BorderRadius.circular(15), // Rounded corners
+          border: Border.all(
+            color: Colors.white, // Border color
+            width: 5, // Border width
           ),
-          Switch(
-            value: _isDarkMode, // Set initial value
-            onChanged: (value) {
-              setState(() {
-                _isDarkMode = value;
-              });
-              // Apply theme based on switch value (explained later)
-            },
-          ),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Text(
+                'SETTINGS',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Dark Mode',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Switch(
+                    value: _isDarkMode,
+                    onChanged: (value) {
+                      _setDarkMode(value);
+                    },
+                    activeColor: Colors.green,
+                    inactiveTrackColor: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Set Pincode Lock',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Switch(
+                    value: _isPincodeEnabled,
+                    onChanged: (value) {
+                      _setPincodeEnabled(value);
+                    },
+                    activeColor: Colors.green,
+                    inactiveTrackColor: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+}
+
+class PinCodeInput extends StatefulWidget {
+  final Function(String) onChanged;
+
+  const PinCodeInput({Key? key, required this.onChanged}) : super(key: key);
+
+  @override
+  _PinCodeInputState createState() => _PinCodeInputState();
+}
+
+class _PinCodeInputState extends State<PinCodeInput> {
+  final List<FocusNode> _pinNodes = List.generate(4, (index) => FocusNode());
+  final List<TextEditingController> _pinControllers =
+      List.generate(4, (index) => TextEditingController());
+
+  @override
+  void dispose() {
+    for (var node in _pinNodes) {
+      node.dispose();
+    }
+    for (var controller in _pinControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(4, (index) {
+        return SizedBox(
+          width: 60,
+          height: 60,
+          child: TextField(
+            controller: _pinControllers[index],
+            focusNode: _pinNodes[index],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            onChanged: (value) {
+              if (value.isNotEmpty && index < 3) {
+                _pinNodes[index].unfocus();
+                FocusScope.of(context).requestFocus(_pinNodes[index + 1]);
+              } else if (value.isEmpty && index > 0) {
+                _pinNodes[index].unfocus();
+                FocusScope.of(context).requestFocus(_pinNodes[index - 1]);
+              }
+              if (value.length > 1) {
+                _pinControllers[index].text = value.substring(0, 1);
+                _pinControllers[index].selection =
+                    TextSelection.collapsed(offset: 1);
+              }
+              widget.onChanged(getPin());
+            },
+            decoration: InputDecoration(
+              counterText: '',
+              contentPadding: EdgeInsets.zero,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+            ),
+            maxLength: 1,
+            onTap: () {
+              _pinNodes[index].requestFocus();
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  String getPin() {
+    String pin = '';
+    for (var controller in _pinControllers) {
+      pin += controller.text;
+    }
+    return pin;
   }
 }
