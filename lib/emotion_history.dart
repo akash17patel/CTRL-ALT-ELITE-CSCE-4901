@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:mind_lift/services/database.dart';
+import 'services/database.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class EmotionHistory extends StatefulWidget {
