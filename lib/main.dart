@@ -149,16 +149,20 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Text('Submit'),
                   ),
                 if (!_isPincodeEnabled)
-                  Image.asset(
-                    'assets/ML.png',
-                    height: 120, // Adjust the height as needed
+                  Column(
+                    children: [
+                      Image.asset(
+                        'assets/ML.png',
+                        height: 120, // Adjust the height as needed
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          navigateToMainContent();
+                        },
+                        child: Text('CONTINUE TO MINDLIFT'),
+                      ),
+                    ],
                   ),
-                ElevatedButton(
-                  onPressed: () {
-                    navigateToMainContent();
-                  },
-                  child: Text('CONTINUE TO MINDLIFT'),
-                ),
               ],
             ),
           ),
