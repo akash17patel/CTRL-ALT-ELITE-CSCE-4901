@@ -79,12 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (_isNewUser) {
       return Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/splash_bg.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
+          color: Colors.black, // Black bg color
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -112,12 +107,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       return Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/splash_bg.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
+          color: Colors.black, // Black bg color
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -159,12 +149,16 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Text('Submit'),
                   ),
                 if (!_isPincodeEnabled)
-                  ElevatedButton(
-                    onPressed: () {
-                      navigateToMainContent();
-                    },
-                    child: Text('Continue without PIN'),
+                  Image.asset(
+                    'assets/ML.png',
+                    height: 120, // Adjust the height as needed
                   ),
+                ElevatedButton(
+                  onPressed: () {
+                    navigateToMainContent();
+                  },
+                  child: Text('CONTINUE TO MINDLIFT'),
+                ),
               ],
             ),
           ),
@@ -639,6 +633,8 @@ class _PinCodeInputState extends State<PinCodeInput> {
               ),
             ),
             maxLength: 1,
+            style: TextStyle(
+                color: Colors.white, fontSize: 24), // Set text color and size
             onTap: () {
               _pinNodes[index].requestFocus();
             },
