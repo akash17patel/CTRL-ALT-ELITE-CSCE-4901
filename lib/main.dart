@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
 import 'emotion_history.dart';
@@ -12,10 +13,11 @@ import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences pref = await SharedPreferences.getInstance();  
   await requestPermissions();
   MindliftDatabase.instance.database; // Initialize the DB
   await AIClassifier.instance.initModel(); // Init AI model singleton
-  runApp(MyApp());
+  runApp(MyApp(sharedPreferences: pref,));
 }
 
 Future<void> requestPermissions() async {
@@ -31,28 +33,70 @@ Future<void> initializeNotifications() async {
   await localNotificationService.initialize();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+
+  final SharedPreferences sharedPreferences;
+   MyApp({super.key, required this.sharedPreferences});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDarkMode = false;
+
+
+  @override
+  void initState() {
+     isDarkMode = widget.sharedPreferences.getBool('isDarkTheme')??false;     
+    super.initState();
+  }
+
+  toggleDarkTheme()async{
+    SharedPreferences prefs = widget.sharedPreferences;
+    isDarkMode = !isDarkMode;
+    await prefs.setBool('isDarkTheme', isDarkMode);
+    setState(() {      
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+
     return MaterialApp(
       title: 'MINDLIFT',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      home: SplashScreen(),
+      theme:  isDarkMode? ThemeData.dark(): ThemeData.light(),
+      // theme: ThemeData(
+      //   primarySwatch: Colors.purple,
+      // ),
+
+      home: SplashScreen(toggleDarkThemeCallback: toggleDarkTheme,),
     );
   }
 }
 
 class SplashScreen extends StatefulWidget {
+    final VoidCallback toggleDarkThemeCallback;
+
+  const SplashScreen({super.key, required this.toggleDarkThemeCallback});
+  
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
+
+
+
+
   String _pincode = '';
   bool _isPincodeEnabled = false;
   bool _isNewUser = false;
+
+  
 
   @override
   void initState() {
@@ -70,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigateToMainContent() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => MyAppContent()),
+      MaterialPageRoute(builder: (context) => MyAppContent(toggleDarkThemeCallback: widget.toggleDarkThemeCallback,)),
     );
   }
 
@@ -84,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+              const  Text(
                   'Welcome to MINDLIFT!',
                   style: TextStyle(
                     fontSize: 24,
@@ -113,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (_isPincodeEnabled)
-                  Text(
+               const   Text(
                     'Enter PIN Code',
                     style: TextStyle(
                       fontSize: 24,
@@ -169,16 +213,35 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 class MyAppContent extends StatefulWidget {
+  final VoidCallback toggleDarkThemeCallback;
+
+  const MyAppContent({super.key, required this.toggleDarkThemeCallback});
+
+
+
   @override
   _MyAppContentState createState() => _MyAppContentState();
 }
 
 class _MyAppContentState extends State<MyAppContent> {
-  final List<Widget> _pages = [
+
+
+  VoidCallback? toggleCallback;
+    List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    toggleCallback = widget.toggleDarkThemeCallback;
+    _pages = [
     HomePage(),
-    SettingsPage(),
+    SettingsPage(toggleDarkThemeCallback:toggleCallback!),
   ];
 
+    super.initState();
+  }
+
+
+  
   final PageController _pageController = PageController();
   int _selectedIndex = 0;
 
@@ -398,6 +461,10 @@ class HomePage extends StatelessWidget {
 
 // Settings page widget
 class SettingsPage extends StatefulWidget {
+  final VoidCallback toggleDarkThemeCallback;
+  const SettingsPage({super.key, required this.toggleDarkThemeCallback});
+
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -410,24 +477,26 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _loadSettings();
+    getDarkModeSettings();
+    
   }
 
   Future<void> _loadSettings() async {
-    bool darkMode = await MindliftDatabase.instance.getDarkMode();
+  //  bool darkMode = await MindliftDatabase.instance.getDarkMode();
     bool pincodeEnabled = await MindliftDatabase.instance.getPincode() != null;
 
     setState(() {
-      _isDarkMode = darkMode;
+     // _isDarkMode = darkMode;
       _isPincodeEnabled = pincodeEnabled;
     });
   }
 
-  Future<void> _setDarkMode(bool isDarkMode) async {
-    await MindliftDatabase.instance.setDarkMode(isDarkMode);
-    setState(() {
-      _isDarkMode = isDarkMode;
-    });
-  }
+  // Future<void> _setDarkMode(bool isDarkMode) async {
+  //   await MindliftDatabase.instance.setDarkMode(isDarkMode);
+  //   setState(() {
+  //     _isDarkMode = isDarkMode;
+  //   });
+  // }
 
   Future<void> _setPincodeEnabled(bool isEnabled) async {
     if (isEnabled) {
@@ -481,6 +550,11 @@ class _SettingsPageState extends State<SettingsPage> {
     return pincode;
   }
 
+  getDarkModeSettings()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isDarkMode = prefs.getBool('isDarkTheme')??false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -520,11 +594,22 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Colors.white,
                     ),
                   ),
+                  // InkWell(
+                  //   onTap:
+                  //     widget.toggleDarkThemeCallback,
+                    
+                  //   child: Text('123')),
                   Switch(
                     value: _isDarkMode,
                     onChanged: (value) {
-                      _setDarkMode(value);
+                    //  _setDarkMode(value);
+                    _isDarkMode=!_isDarkMode;
+                    widget.toggleDarkThemeCallback();
+                    setState(() {
+                      
+                    });
                     },
+                    
                     activeColor: Colors.green,
                     inactiveTrackColor: Colors.red,
                   ),
