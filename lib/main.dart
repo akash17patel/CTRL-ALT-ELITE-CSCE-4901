@@ -9,6 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'services/database.dart';
 import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
+import 'dart:async';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -635,7 +637,7 @@ class PinCodeInput extends StatefulWidget {
 class _PinCodeInputState extends State<PinCodeInput> {
   final List<FocusNode> _pinNodes = List.generate(4, (index) => FocusNode());
   final List<TextEditingController> _pinControllers =
-      List.generate(4, (index) => TextEditingController());
+  List.generate(4, (index) => TextEditingController());
 
   @override
   void dispose() {
@@ -669,11 +671,6 @@ class _PinCodeInputState extends State<PinCodeInput> {
                 _pinNodes[index].unfocus();
                 FocusScope.of(context).requestFocus(_pinNodes[index - 1]);
               }
-              if (value.length > 1) {
-                _pinControllers[index].text = value.substring(0, 1);
-                _pinControllers[index].selection =
-                    TextSelection.collapsed(offset: 1);
-              }
               widget.onChanged(getPin());
             },
             decoration: InputDecoration(
@@ -695,6 +692,7 @@ class _PinCodeInputState extends State<PinCodeInput> {
               ),
             ),
             maxLength: 1,
+            obscureText: true, // Display bullet points
             onTap: () {
               _pinNodes[index].requestFocus();
             },
