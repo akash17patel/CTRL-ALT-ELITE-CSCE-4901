@@ -446,12 +446,68 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       }
     } else {
-      // Clear Pincode
-      await MindliftDatabase.instance.delete('Pincode', 1);
-      setState(() {
-        _isPincodeEnabled = false;
-      });
+      // Check if PIN code is set before disabling
+      bool isPincodeSet = await MindliftDatabase.instance.getPincode() != null;
+      if (isPincodeSet) {
+        // Ask for current PIN code
+        String? currentPincode = await _showCurrentPincodePopup();
+        String? savedPincode = await MindliftDatabase.instance.getPincode();
+
+        if (currentPincode == savedPincode) {
+          // If the current PIN code matches, then disable PIN code
+          await MindliftDatabase.instance.delete('Pincode', 1);
+          setState(() {
+            _isPincodeEnabled = false;
+          });
+        } else {
+          // If the current PIN code does not match, show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Incorrect PIN Code. Please try again.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // If PIN code is not set, simply disable PIN code
+        await MindliftDatabase.instance.delete('Pincode', 1);
+        setState(() {
+          _isPincodeEnabled = false;
+        });
+      }
     }
+  }
+  Future<String?> _showCurrentPincodePopup() async {
+    String? pincode;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Current PIN Code'),
+          content: TextField(
+            onChanged: (value) {
+              pincode = value;
+            },
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            decoration: InputDecoration(
+              hintText: 'Enter 4-digit Pincode',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(pincode);
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return pincode;
   }
 
   Future<String?> _showPincodeSetupPopup() async {
