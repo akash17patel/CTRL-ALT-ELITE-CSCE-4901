@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
 import 'emotion_history.dart';
@@ -13,11 +12,10 @@ import 'chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences pref = await SharedPreferences.getInstance();  
   await requestPermissions();
   MindliftDatabase.instance.database; // Initialize the DB
   await AIClassifier.instance.initModel(); // Init AI model singleton
-  runApp(MyApp(sharedPreferences: pref,));
+  runApp(MyApp());
 }
 
 Future<void> requestPermissions() async {
@@ -33,70 +31,28 @@ Future<void> initializeNotifications() async {
   await localNotificationService.initialize();
 }
 
-class MyApp extends StatefulWidget {
-
-  final SharedPreferences sharedPreferences;
-   MyApp({super.key, required this.sharedPreferences});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool isDarkMode = false;
-
-
-  @override
-  void initState() {
-     isDarkMode = widget.sharedPreferences.getBool('isDarkTheme')??false;     
-    super.initState();
-  }
-
-  toggleDarkTheme()async{
-    SharedPreferences prefs = widget.sharedPreferences;
-    isDarkMode = !isDarkMode;
-    await prefs.setBool('isDarkTheme', isDarkMode);
-    setState(() {      
-    });
-  }
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-
     return MaterialApp(
       title: 'MINDLIFT',
-      theme:  isDarkMode? ThemeData.dark(): ThemeData.light(),
-      // theme: ThemeData(
-      //   primarySwatch: Colors.purple,
-      // ),
-
-      home: SplashScreen(toggleDarkThemeCallback: toggleDarkTheme,),
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: SplashScreen(),
     );
   }
 }
 
 class SplashScreen extends StatefulWidget {
-    final VoidCallback toggleDarkThemeCallback;
-
-  const SplashScreen({super.key, required this.toggleDarkThemeCallback});
-  
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-
-
-
-
-
   String _pincode = '';
   bool _isPincodeEnabled = false;
   bool _isNewUser = false;
-
-  
 
   @override
   void initState() {
@@ -114,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigateToMainContent() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => MyAppContent(toggleDarkThemeCallback: widget.toggleDarkThemeCallback,)),
+      MaterialPageRoute(builder: (context) => MyAppContent()),
     );
   }
 
@@ -128,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              const  Text(
+                Text(
                   'Welcome to MINDLIFT!',
                   style: TextStyle(
                     fontSize: 24,
@@ -157,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (_isPincodeEnabled)
-               const   Text(
+                  Text(
                     'Enter PIN Code',
                     style: TextStyle(
                       fontSize: 24,
@@ -193,16 +149,20 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Text('Submit'),
                   ),
                 if (!_isPincodeEnabled)
-                  Image.asset(
-                    'assets/ML.png',
-                    height: 120, // Adjust the height as needed
+                  Column(
+                    children: [
+                      Image.asset(
+                        'assets/ML.png',
+                        height: 120, // Adjust the height as needed
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          navigateToMainContent();
+                        },
+                        child: Text('CONTINUE TO MINDLIFT'),
+                      ),
+                    ],
                   ),
-                ElevatedButton(
-                  onPressed: () {
-                    navigateToMainContent();
-                  },
-                  child: Text('CONTINUE TO MINDLIFT'),
-                ),
               ],
             ),
           ),
@@ -213,35 +173,16 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 class MyAppContent extends StatefulWidget {
-  final VoidCallback toggleDarkThemeCallback;
-
-  const MyAppContent({super.key, required this.toggleDarkThemeCallback});
-
-
-
   @override
   _MyAppContentState createState() => _MyAppContentState();
 }
 
 class _MyAppContentState extends State<MyAppContent> {
-
-
-  VoidCallback? toggleCallback;
-    List<Widget> _pages = [];
-
-  @override
-  void initState() {
-    toggleCallback = widget.toggleDarkThemeCallback;
-    _pages = [
+  final List<Widget> _pages = [
     HomePage(),
-    SettingsPage(toggleDarkThemeCallback:toggleCallback!),
+    SettingsPage(),
   ];
 
-    super.initState();
-  }
-
-
-  
   final PageController _pageController = PageController();
   int _selectedIndex = 0;
 
@@ -461,10 +402,6 @@ class HomePage extends StatelessWidget {
 
 // Settings page widget
 class SettingsPage extends StatefulWidget {
-  final VoidCallback toggleDarkThemeCallback;
-  const SettingsPage({super.key, required this.toggleDarkThemeCallback});
-
-
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -477,26 +414,24 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _loadSettings();
-    getDarkModeSettings();
-    
   }
 
   Future<void> _loadSettings() async {
-  //  bool darkMode = await MindliftDatabase.instance.getDarkMode();
+    bool darkMode = await MindliftDatabase.instance.getDarkMode();
     bool pincodeEnabled = await MindliftDatabase.instance.getPincode() != null;
 
     setState(() {
-     // _isDarkMode = darkMode;
+      _isDarkMode = darkMode;
       _isPincodeEnabled = pincodeEnabled;
     });
   }
 
-  // Future<void> _setDarkMode(bool isDarkMode) async {
-  //   await MindliftDatabase.instance.setDarkMode(isDarkMode);
-  //   setState(() {
-  //     _isDarkMode = isDarkMode;
-  //   });
-  // }
+  Future<void> _setDarkMode(bool isDarkMode) async {
+    await MindliftDatabase.instance.setDarkMode(isDarkMode);
+    setState(() {
+      _isDarkMode = isDarkMode;
+    });
+  }
 
   Future<void> _setPincodeEnabled(bool isEnabled) async {
     if (isEnabled) {
@@ -509,12 +444,69 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       }
     } else {
-      // Clear Pincode
-      await MindliftDatabase.instance.delete('Pincode', 1);
-      setState(() {
-        _isPincodeEnabled = false;
-      });
+      // Check if PIN code is set before disabling
+      bool isPincodeSet = await MindliftDatabase.instance.getPincode() != null;
+      if (isPincodeSet) {
+        // Ask for current PIN code
+        String? currentPincode = await _showCurrentPincodePopup();
+        String? savedPincode = await MindliftDatabase.instance.getPincode();
+
+        if (currentPincode == savedPincode) {
+          // If the current PIN code matches, then disable PIN code
+          await MindliftDatabase.instance.delete('Pincode', 1);
+          setState(() {
+            _isPincodeEnabled = false;
+          });
+        } else {
+          // If the current PIN code does not match, show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Incorrect PIN Code. Please try again.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // If PIN code is not set, simply disable PIN code
+        await MindliftDatabase.instance.delete('Pincode', 1);
+        setState(() {
+          _isPincodeEnabled = false;
+        });
+      }
     }
+  }
+
+  Future<String?> _showCurrentPincodePopup() async {
+    String? pincode;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Current PIN Code'),
+          content: TextField(
+            onChanged: (value) {
+              pincode = value;
+            },
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            decoration: InputDecoration(
+              hintText: 'Enter 4-digit Pincode',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(pincode);
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return pincode;
   }
 
   Future<String?> _showPincodeSetupPopup() async {
@@ -548,11 +540,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
 
     return pincode;
-  }
-
-  getDarkModeSettings()async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isDarkMode = prefs.getBool('isDarkTheme')??false;
   }
 
   @override
@@ -594,22 +581,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Colors.white,
                     ),
                   ),
-                  // InkWell(
-                  //   onTap:
-                  //     widget.toggleDarkThemeCallback,
-                    
-                  //   child: Text('123')),
                   Switch(
                     value: _isDarkMode,
                     onChanged: (value) {
-                    //  _setDarkMode(value);
-                    _isDarkMode=!_isDarkMode;
-                    widget.toggleDarkThemeCallback();
-                    setState(() {
-                      
-                    });
+                      _setDarkMode(value);
                     },
-                    
                     activeColor: Colors.green,
                     inactiveTrackColor: Colors.red,
                   ),
