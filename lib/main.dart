@@ -10,11 +10,11 @@ import 'services/database.dart';
 import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
-enum FontSize { small, medium, large }
+//enum FontSize { small, medium, large }
 
-
+/*
 extension FontSizeExtension on FontSize {
   int get value {
     switch (this) {
@@ -26,7 +26,7 @@ extension FontSizeExtension on FontSize {
         return 2;
     }
   }
-}
+}*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
@@ -428,24 +428,24 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false; // Variable to store dark mode state
   bool _isPincodeEnabled = false; // Variable to store pincode enabled state
-  FontSize _selectedFontSize = FontSize.medium; // Default font size
+ /* FontSize _selectedFontSize = FontSize.medium; // Default font size
   late SharedPreferences _prefs;
 
-  //late FontSize _selectedFontSize;
+  //late FontSize _selectedFontSize;*/
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
-    _loadFontSize();
+   // _loadFontSize();
   }
 
   Future<void> _loadSettings() async {
     bool darkMode = await MindliftDatabase.instance.getDarkMode();
     bool pincodeEnabled = await MindliftDatabase.instance.getPincode() != null;
-    _prefs = await SharedPreferences.getInstance();
+ /*   _prefs = await SharedPreferences.getInstance();
     _selectedFontSize =
-    FontSize.values[_prefs.getInt('fontSize') ?? FontSize.medium.index];
+    FontSize.values[_prefs.getInt('fontSize') ?? FontSize.medium.index];*/
 
     setState(() {
       _isDarkMode = darkMode;
@@ -502,7 +502,7 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     }
   }
-
+/*
   // New methods to save and load font size
   Future<void> _saveFontSize(FontSize fontSize) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -526,7 +526,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _selectedFontSize = fontSize; // Update the selected font size
     });
   }
-
+*/
   Future<String?> _showCurrentPincodePopup() async {
     String? pincode;
 
@@ -650,7 +650,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            Padding(
+           /* Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -687,7 +687,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-            ),
+            ),*/
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -734,7 +734,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
+/*
   // Helper function to get font size for dropdown items
   double _getFontSize(FontSize fontSize) {
     switch (fontSize) {
@@ -747,7 +747,7 @@ class _SettingsPageState extends State<SettingsPage> {
       default:
         return 20.0; // Default to medium font size
     }
-  }
+  }*/
 }
 
 
