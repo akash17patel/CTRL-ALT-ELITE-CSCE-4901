@@ -101,6 +101,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
+
     return Scaffold(
       appBar: AppBar(title: Text('AI Chat')),
       body: Column(
@@ -112,16 +116,37 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final msg = messages[index];
                 final isUserMessage = msg['sender'] == 'User';
+
+
+                DateTime dateTime = DateTime.parse(msg['timestamp']);
+                var formatter = DateFormat('dd/mmm/yyyy HH:mm');
+                String formattedDate = formatter.format(dateTime);
+
+
+
+
                 return ListTile(
                   title: Text(
                     msg['text'],
                     style: TextStyle(
                         color: isUserMessage ? Colors.blue : Colors.green),
                   ),
-                  subtitle: Text(
-                    msg['sender'],
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        msg['sender'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                       Text(
+                      //  msg['timestamp'].toString().split('T').first,
+                    //  msg['timestamp'],                      
+                   formattedDate,
+                        style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+                      ),
+                    ],
                   ),
+
                 );
               },
             ),
