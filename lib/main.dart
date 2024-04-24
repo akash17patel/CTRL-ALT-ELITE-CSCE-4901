@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'resources_page.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
 import 'emotion_history.dart';
 import 'emergency_contact.dart';
-import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'services/database.dart';
@@ -12,21 +12,7 @@ import 'chat_screen.dart';
 import 'dart:async';
 //import 'package:shared_preferences/shared_preferences.dart';
 
-//enum FontSize { small, medium, large }
 
-/*
-extension FontSizeExtension on FontSize {
-  int get value {
-    switch (this) {
-      case FontSize.small:
-        return 0;
-      case FontSize.medium:
-        return 1;
-      case FontSize.large:
-        return 2;
-    }
-  }
-}*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
@@ -318,7 +304,7 @@ class HomePage extends StatelessWidget {
     buttonNames[2] = 'My Goals';
     buttonNames[3] = 'Emotion History';
     buttonNames[4] = 'Emergency Contact';
-    buttonNames[5] = 'Notifications Test';
+    buttonNames[5] = 'Resources';
 
     return ListView(
       padding: EdgeInsets.all(20),
@@ -378,7 +364,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NotificationsPage(),
+                        builder: (context) => ResourcesPage(),
                       ),
                     );
                     break;
@@ -428,10 +414,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false; // Variable to store dark mode state
   bool _isPincodeEnabled = false; // Variable to store pincode enabled state
- /* FontSize _selectedFontSize = FontSize.medium; // Default font size
-  late SharedPreferences _prefs;
 
-  //late FontSize _selectedFontSize;*/
 
   @override
   void initState() {
@@ -502,31 +485,7 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     }
   }
-/*
-  // New methods to save and load font size
-  Future<void> _saveFontSize(FontSize fontSize) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('font_size', fontSize.value);
-  }
 
-  Future<void> _loadFontSize() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? fontSizeValue = prefs.getInt('font_size');
-    if (fontSizeValue != null) {
-      setState(() {
-        _selectedFontSize =
-            FontSize.values.firstWhere((size) => size.value == fontSizeValue);
-      });
-    }
-  }
-
-  Future<void> _setFontSize(FontSize fontSize) async {
-    await _saveFontSize(fontSize); // Save the selected font size
-    setState(() {
-      _selectedFontSize = fontSize; // Update the selected font size
-    });
-  }
-*/
   Future<String?> _showCurrentPincodePopup() async {
     String? pincode;
 
@@ -593,12 +552,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return pincode;
   }
 
-  /* Future<void> _setFontSize(FontSize fontSize) async {
-    // Implementation for setting font size
-    setState(() {
-      _selectedFontSize = fontSize;
-    });
-  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -650,44 +604,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-           /* Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Font Size',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                  DropdownButton<FontSize>(
-                    value: _selectedFontSize,
-                    onChanged: (FontSize? newValue) {
-                      if (newValue != null) {
-                        _setFontSize(newValue); // Apply the selected font size
-                      }
-                    },
-                    items: FontSize.values.map((FontSize fontSize) {
-                      return DropdownMenuItem<FontSize>(
-                        value: fontSize,
-                        child: Text(
-                          fontSize
-                              .toString()
-                              .split('.')
-                              .last,
-                          style: TextStyle(
-                            fontSize: _getFontSize(
-                                fontSize), // Use the selected font size here
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),*/
+
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -711,45 +628,129 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            // Font Size Setting
-            /*ListTile(
-              title: Text('Font Size'),
-              trailing: DropdownButton<FontSize>(
-                value: _selectedFontSize,
-                onChanged: (FontSize? newSize) {
-                  if (newSize != null) {
-                    _setFontSize(newSize);
-                  }
-                },
-                items: FontSize.values.map((fontSize) {
-                  return DropdownMenuItem<FontSize>(
-                    value: fontSize,
-                    child: Text(fontSizeToString(fontSize)),
-                  );
-                }).toList(),
-              ),
-            ),*/
           ],
         ),
       ),
     );
   }
-/*
-  // Helper function to get font size for dropdown items
-  double _getFontSize(FontSize fontSize) {
-    switch (fontSize) {
-      case FontSize.small:
-        return 16.0; // Small font size
-      case FontSize.medium:
-        return 20.0; // Medium font size
-      case FontSize.large:
-        return 24.0; // Large font size
-      default:
-        return 20.0; // Default to medium font size
-    }
-  }*/
+
+}
+// Resources page widget
+/*class ResourcesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(20), // 20 pixels padding from all sides
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.3), // Background color with opacity
+          borderRadius: BorderRadius.circular(15), // Rounded corners
+          border: Border.all(
+            color: Colors.white, // Border color
+            width: 5, // Border width
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Text(
+                'Resources',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Text(
+                'Links and helpful resources to help you on your journey.',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  ResourceTile(
+                    title: 'Resource 1',
+                    subtitle: 'Subtitle 1',
+                    url: 'https://www.example.com',
+                  ),
+                  ResourceTile(
+                    title: 'Resource 2',
+                    subtitle: 'Subtitle 2',
+                    url: 'https://www.example.com',
+                  ),
+                  ResourceTile(
+                    title: 'Resource 3',
+                    subtitle: 'Subtitle 3',
+                    url: 'https://www.example.com',
+                  ),
+                  ResourceTile(
+                    title: 'Resource 4',
+                    subtitle: 'Subtitle 4',
+                    url: 'https://www.example.com',
+                  ),
+                  ResourceTile(
+                    title: 'Resource 5',
+                    subtitle: 'Subtitle 5',
+                    url: 'https://www.example.com',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
+// Resource tile widget
+class ResourceTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String url;
+
+  ResourceTile({
+    required this.title,
+    required this.subtitle,
+    required this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.white,
+        ),
+      ),
+      onTap: () {
+        // Open the URL when the tile is tapped
+        // If you want to navigate to a new screen, replace the below code with a navigator push.
+        // E.g., Navigator.push(context, MaterialPageRoute(builder: (context) => NewPage()));
+        // You can pass the URL as a parameter to the new page constructor.
+      },
+    );
+  }
+}*/
 
 class PinCodeInput extends StatefulWidget {
   final Function(String) onChanged;
