@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResourcesPage extends StatelessWidget {
   @override
@@ -24,9 +25,9 @@ class ResourcesPage extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 child: Text(
-                  'Emergency Services',
+                  'Resources for when in need',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -38,38 +39,48 @@ class ResourcesPage extends StatelessWidget {
                     ResourceTile(
                       title: 'Emergency Services',
                       subtitle: '911',
+                      url: 'tel:911', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'Suicide Hotline',
-                      subtitle: '1-800-273-TALK (8255)',
+                      subtitle: '1-800-273-TALK',
+                      url: 'tel:1-800-273-8255', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'National Domestic Violence Hotline',
-                      subtitle: '1-800-799-SAFE (7233)',
+                      subtitle: '1-800-799-SAFE',
+                      url: 'tel:1-800-799-7233', // Phone number URL
                     ),
                     ResourceTile(
-                      title: 'Substance Abuse and Mental Health Services Administration (SAMHSA)',
-                      subtitle: '1-800-662-HELP (4357)',
+                      title:
+                      'Substance Abuse and Mental Health Services Administration (SAMHSA)',
+                      subtitle: '1-800-662-HELP',
+                      url: 'tel:1-800-662-4357', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'National Alliance on Mental Illness (NAMI)',
-                      subtitle: '1-800-950-NAMI (6264)',
+                      subtitle: '1-800-950-NAMI',
+                      url: 'tel:1-800-950-6264', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'Crisis Text Line',
                       subtitle: 'Text HOME to 741741',
+                      url: 'sms:741741?body=HOME', // Crisis text line URL
                     ),
                     ResourceTile(
-                      title: 'Veterans Crisis Line',
-                      subtitle: '1-800-273-8255 (Press 1)',
+                      title: 'Veterans Crisis Line (Press 1)',
+                      subtitle: '1-800-273-8255',
+                      url: 'tel:1-800-273-8255', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'LGBT National Help Center',
                       subtitle: '1-888-843-4564',
+                      url: 'tel:1-888-843-4564', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'The Trevor Project (LGBTQ+ Youth)',
                       subtitle: '1-866-488-7386',
+                      url: 'tel:1-866-488-7386', // Phone number URL
                     ),
                   ],
                 ),
@@ -85,10 +96,12 @@ class ResourcesPage extends StatelessWidget {
 class ResourceTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String url;
 
   ResourceTile({
     required this.title,
     required this.subtitle,
+    required this.url,
   });
 
   @override
@@ -110,9 +123,17 @@ class ResourceTile extends StatelessWidget {
         ),
       ),
       onTap: () {
-        // Implement what you want to happen when a resource is tapped
-        // For example, you can launch a website or make a phone call.
+        _launchResource(url);
       },
     );
+  }
+
+  // Function to launch URL
+  void _launchResource(String url) async {
+    try {
+      await launch(url);
+    } catch (e) {
+      throw 'Could not launch $url';
+    }
   }
 }
