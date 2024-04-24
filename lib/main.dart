@@ -5,10 +5,15 @@ import 'emotion_history.dart';
 import 'emergency_contact.dart';
 import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
+import 'services/NotificationDetailsPage.dart'; // Import the NotificationDetailsPage
 import 'package:permission_handler/permission_handler.dart';
 import 'services/database.dart';
 import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
+import 'dart:async';
+
+// Define 'service' as a global variable
+final LocalNotificationService service = LocalNotificationService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +25,10 @@ void main() async {
 
 Future<void> requestPermissions() async {
   await Permission.microphone.request();
-  await Permission.sms.request();
+  //await Permission.sms.request();
   await Permission.notification.request();
   await Permission.phone.request();
-  await Permission.location.request();
+  //await Permission.location.request();
 }
 
 Future<void> initializeNotifications() async {
@@ -414,6 +419,8 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _loadSettings();
+    listenToNotification(context);
+    service.initialize();
   }
 
   Future<void> _loadSettings() async {
@@ -544,6 +551,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    listenToNotification(context); // Listen to notifications
     return Padding(
       padding: EdgeInsets.all(15), // 5 pixels padding from all sides
       child: Container(
@@ -615,10 +623,96 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            /*Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Crisis Detection',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Switch(
+                    value: _isCrisisDetectionEnabled,
+                    onChanged: (value) {
+                      _setCrisisDetectionEnabled(value);
+                    },
+                    activeColor: Colors.green,
+                    inactiveTrackColor: Colors.red,
+                  ),
+                ],
+              ),
+            ),*/
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Set Notification Reminder',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await service.showNotification(
+                        id: 0,
+                        title: 'Notification Title',
+                        body: 'Test is working',
+                      );
+                    },
+                    child: Text(
+                      'Set Reminder',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.green),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  // Modify the listenToNotification function to accept 'context' as a parameter
+  void listenToNotification(BuildContext context) {
+    service.onNotificationClick.stream.listen((String? payload) {
+      onNotificationListener(context, payload);
+    });
+  }
+
+// Modify the onNotificationListener function to accept 'context' as a parameter
+  void onNotificationListener(BuildContext context, String? payload) {
+    if (payload != null && payload.isNotEmpty) {
+      print('payload $payload');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NotificationDetailsPage(
+              payload: payload, delay: Duration(seconds: 10)),
+        ),
+      );
+    }
   }
 }
 

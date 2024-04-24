@@ -58,22 +58,51 @@ class LocalNotificationService {
     await _localNotificationService.show(id, title, body, details);
   }
 
-  Future<void> showScheduledNotification(
-      {required int id,
-      required String title,
-      required String body,
-      required int seconds}) async {
+  // Define the zonedScheduleNotification method
+  Future<void> zonedScheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  }) async {
     final details = await _notificationDetails();
     await _localNotificationService.zonedSchedule(
       id,
       title,
       body,
-      tz.TZDateTime.from(
-          DateTime.now().add(Duration(seconds: seconds)), tz.local),
+      scheduledDate,
       details,
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      payload: '$id',
+    );
+  }
+
+  Future<void> showScheduledNotification({
+    required int id,
+    required String title,
+    required String body,
+    required int seconds,
+  }) async {
+    final details = await _notificationDetails();
+
+    // Get the current time in the local time zone
+    final now = tz.TZDateTime.now(tz.local);
+
+    // Calculate the scheduled time by adding the specified seconds to the current time
+    final scheduledTime = now.add(Duration(seconds: seconds));
+
+    await _localNotificationService.zonedSchedule(
+      id,
+      title,
+      body,
+      scheduledTime,
+      details,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: '$id',
     );
   }
 
