@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
 import 'emotion_history.dart';
@@ -11,16 +12,39 @@ import 'services/database.dart';
 import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
 import 'dart:async';
+import 'services/foreground_audio.dart';
+import 'dart:isolate';
 
 // Define 'service' as a global variable
 final LocalNotificationService service = LocalNotificationService();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await requestPermissions();
-  MindliftDatabase.instance.database; // Initialize the DB
-  await AIClassifier.instance.initModel(); // Init AI model singleton
-  runApp(MyApp());
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    print("Flutter bindings initialized.");
+
+    await requestPermissions();
+    print("Permissions requested.");
+
+    await MindliftDatabase.instance.database; // Initialize the DB
+    print("Database initialized.");
+
+    await AIClassifier.instance.initModel(); // Init AI model singleton
+    print("AI model initialized.");
+
+    if (await Permission.microphone.isGranted) { // Check microphone permission explicitly
+      print("Microphone permission granted.");
+      startForegroundService();
+    } else {
+      print("Microphone permission not granted.");
+    }
+
+    runApp(MyApp());
+    print("App running.");
+  } catch (e, s) {
+    print("Error during initialization: $e");
+    print("Stack trace: $s");
+  }
 }
 
 Future<void> requestPermissions() async {
