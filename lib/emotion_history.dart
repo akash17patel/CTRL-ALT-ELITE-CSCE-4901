@@ -13,6 +13,10 @@ class _EmotionHistoryState extends State<EmotionHistory> {
   @override
   void initState() {
     super.initState();
+
+    DateTime s = DateTime.now();
+    _selectedDay = DateTime(s.year, s.month, s.day, s.hour, s.minute, s.second);
+
     _fetchEmotionsForSelectedDay();
   }
 
@@ -24,16 +28,17 @@ class _EmotionHistoryState extends State<EmotionHistory> {
   void _onEmotionSelected(String emotion) async {
     DateTime now = DateTime.now();
     // Create a new DateTime object representing today, with only year, month, and day parts
-   
+
     //DateTime today = DateTime(now.year, now.month, now.day);
-    
+
     // Ensure _selectedDay is also stripped of any time part
 
     DateTime selectedDate = _selectedDay != null
-        ? DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day, _selectedDay!.hour, _selectedDay!.minute, _selectedDay!.second)
-        : now;        
+        ? DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day,
+            _selectedDay!.hour, _selectedDay!.minute, _selectedDay!.second)
+        : now;
 
-    // Now check if the selectedDate is today    
+    // Now check if the selectedDate is today
     if (selectedDate.day == DateTime.now().day) {
       // If the selected date is today, directly add the emotion without showing a prompt
       await MindliftDatabase.instance.insertEmotion(emotion, selectedDate);
@@ -86,7 +91,7 @@ class _EmotionHistoryState extends State<EmotionHistory> {
       //         '${record['emotion']} - ${record['timestamp'].split('T')[0]}')
       //     .toList();
 
-           List<String> emotionList = fetchedEmotions
+      List<String> emotionList = fetchedEmotions
           .map((record) =>
               '${record['emotion']} - ${DateFormat('yyyy-MM-dd hh:mm a').format((DateTime.parse(record['timestamp'])))}')
           .toList();
@@ -118,18 +123,18 @@ class _EmotionHistoryState extends State<EmotionHistory> {
             },
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
-
                 DateTime s = DateTime.now();
 
-                _selectedDay = DateTime(selectedDay.year, selectedDay.month, selectedDay.day, s.hour, s.minute, s.second);
+                _selectedDay = DateTime(selectedDay.year, selectedDay.month,
+                    selectedDay.day, s.hour, s.minute, s.second);
 
-               // _selectedDay = selectedDay;
-                
+                // _selectedDay = selectedDay;
+
                 _focusedDay = focusedDay;
               });
               _fetchEmotionsForSelectedDay();
             },
-            calendarStyle:const CalendarStyle(
+            calendarStyle: const CalendarStyle(
               todayDecoration: BoxDecoration(
                 color: Color.fromARGB(255, 80, 193, 0),
                 shape: BoxShape.circle,
@@ -139,7 +144,7 @@ class _EmotionHistoryState extends State<EmotionHistory> {
                 shape: BoxShape.circle,
               ),
             ),
-            headerStyle:const HeaderStyle(
+            headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
             ),

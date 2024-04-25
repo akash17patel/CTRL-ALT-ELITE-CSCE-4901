@@ -50,7 +50,8 @@
 	<string>Need access to microphone for voice recognition</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need access to location for XYZ</string>
-
+    <key>NSMicrophoneUsageDescription</key>
+        <string>Microphone access is required for crisis recognition.</string>
 
 </dict>
 </plist>
