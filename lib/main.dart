@@ -33,6 +33,7 @@ void main() async {
 
     await service.initialize();
 
+/*
     if (await Permission.microphone.isGranted) { // Check microphone permission explicitly
       print("Microphone permission granted.");
       //startForegroundService();
@@ -43,7 +44,7 @@ void main() async {
     } else {
       print("Microphone permission not granted.");
     }
-
+*/
     runApp(MyApp());
     print("App running.");
   } catch (e, s) {
@@ -578,7 +579,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return pincode;
   }
-
+  
   @override
   Widget build(BuildContext context) {
     listenToNotification(context); // Listen to notifications

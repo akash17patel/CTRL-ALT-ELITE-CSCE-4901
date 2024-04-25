@@ -35,7 +35,7 @@ class AudioClassification {
     _timer?.cancel(); // Cancel any existing timer
 
     // Initialize the timer with a slight delay before the first execution to avoid immediate overlap
-    _timer = Timer.periodic(Duration(seconds: 2), (Timer t) async {
+    _timer = Timer.periodic(Duration(seconds: 3), (Timer t) async {
       // Stop recording and handle inference if recording was ongoing
       await _stopRecording();
 
@@ -199,6 +199,6 @@ class CrisisDetection {
   // Stub for triggering a crisis action
   void triggerCrisisAction() {
     print("Crisis detected! Taking action...");
-    service.showNotification(id: 5, title: "Crisis", body: "Are you alright?");
+    service.showNotification(id: 5, title: "Crisis Detected", body: "Are you alright?");
   }
 }
