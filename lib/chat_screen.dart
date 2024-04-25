@@ -72,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
       'timestamp': DateTime.now(),
     };
     MindliftDatabase.instance
-        .insertChatMessage('User', aiResponse, DateTime.now());
+        .insertChatMessage('AI', aiResponse, DateTime.now());
     setState(() {
       messages.add(aiMessage);
     });
@@ -101,10 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
-
     return Scaffold(
       appBar: AppBar(title: Text('AI Chat')),
       body: Column(
