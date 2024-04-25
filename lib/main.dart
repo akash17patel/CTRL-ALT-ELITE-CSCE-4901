@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mind_lift/resources_page.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
 import 'emotion_history.dart';
 import 'emergency_contact.dart';
-import 'notificationspage.dart';
 import 'services/local_notification_service.dart';
 import 'services/NotificationDetailsPage.dart'; // Import the NotificationDetailsPage
 import 'package:permission_handler/permission_handler.dart';
@@ -13,8 +13,6 @@ import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
 import 'dart:async';
 import 'services/audio_AI.dart';
-import 'services/foreground_audio.dart';
-import 'dart:isolate';
 
 // Define 'service' as a global variable
 final LocalNotificationService service = LocalNotificationService();
@@ -336,7 +334,7 @@ class HomePage extends StatelessWidget {
     buttonNames[2] = 'My Goals';
     buttonNames[3] = 'Emotion History';
     buttonNames[4] = 'Emergency Contact';
-    buttonNames[5] = 'Notifications Test';
+    buttonNames[5] = 'Resources';
 
     return ListView(
       padding: EdgeInsets.all(20),
@@ -396,7 +394,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NotificationsPage(),
+                        builder: (context) => ResourcesPage(),
                       ),
                     );
                     break;

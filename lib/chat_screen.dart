@@ -117,12 +117,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 final msg = messages[index];
                 final isUserMessage = msg['sender'] == 'User';
 
-
+                /* Code, if it didnt pull up a red screen, would display
+                todays date, not the date stored. Logic needs a rework.
                 DateTime dateTime = DateTime.parse(msg['timestamp']);
                 var formatter = DateFormat('dd/mmm/yyyy HH:mm');
                 String formattedDate = formatter.format(dateTime);
 
 
+                 */
 
 
                 return ListTile(
@@ -139,9 +141,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                        Text(
-                      //  msg['timestamp'].toString().split('T').first,
-                    //  msg['timestamp'],                      
-                   formattedDate,
+                        msg['timestamp'].toString().split('T').first,
+                    //  msg['timestamp'],
                         style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
                       ),
                     ],
