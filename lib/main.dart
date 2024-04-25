@@ -12,6 +12,7 @@ import 'services/database.dart';
 import 'services/AIClassifier.dart';
 import 'chat_screen.dart';
 import 'dart:async';
+import 'services/audio_AI.dart';
 import 'services/foreground_audio.dart';
 import 'dart:isolate';
 
@@ -32,9 +33,15 @@ void main() async {
     await AIClassifier.instance.initModel(); // Init AI model singleton
     print("AI model initialized.");
 
+    await service.initialize();
+
     if (await Permission.microphone.isGranted) { // Check microphone permission explicitly
       print("Microphone permission granted.");
-      startForegroundService();
+      //startForegroundService();
+      // Moving from foreground service for demo functionality.
+      AudioClassification audioClassification = AudioClassification();
+      await audioClassification.initRecorder();
+      audioClassification.start();
     } else {
       print("Microphone permission not granted.");
     }
@@ -52,6 +59,7 @@ Future<void> requestPermissions() async {
   //await Permission.sms.request();
   await Permission.notification.request();
   await Permission.phone.request();
+  await Permission.storage.request();
   //await Permission.location.request();
 }
 

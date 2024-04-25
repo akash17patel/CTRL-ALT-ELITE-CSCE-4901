@@ -1,3 +1,4 @@
+/*
 import 'dart:isolate';
 import 'dart:developer';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -26,9 +27,9 @@ void initForegroundTask() {
     foregroundTaskOptions: const ForegroundTaskOptions(
       interval: 975,  // 975 milliseconds
       isOnceEvent: false,
-      autoRunOnBoot: true,
+      autoRunOnBoot: false,
       allowWakeLock: true,
-      allowWifiLock: true,
+      allowWifiLock: false,
     ),
   );
 }
@@ -49,19 +50,30 @@ void startCallback() {
 
 class AudioTaskHandler extends TaskHandler {
   final AudioClassification _audioClassification = AudioClassification();
+  bool hasBeenInit = false;
 
   @override
   void onStart(DateTime timestamp, SendPort? sendPort) async {
       await _audioClassification.initializeRecorder();
+      log("Recorder Started");
       await _audioClassification.startRecording();
+      hasBeenInit = true;
   }
 
   @override
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    var results = await _audioClassification.stopRecording();
-    crisis.updateValues(results);
-    log(crisis.labelValues.entries.first.value.first.toString());
+    if (!hasBeenInit) return;
+    log("Before Record");
+    bool recorded = await _audioClassification.stopRecording();
+    log("After Record");
+    if (recorded) {
+      crisis.updateValues(await _audioClassification.interference());
+    }
+    if (!crisis.labelValues.isEmpty) {
+      log(crisis.labelValues.entries.first.value.first.toString());
+    }
     await _audioClassification.startRecording();
+    log("RECORD IN ONREPEAT");
   }
 
   @override
@@ -70,55 +82,4 @@ class AudioTaskHandler extends TaskHandler {
     _audioClassification.dispose();
   }
 }
-
-class CrisisDetection {
-  static const List<String> classificationLabels = [
-    "Screaming",
-    "Crying, sobbing",
-    "Whimper",
-    "Wail, moan",
-    "Groan",
-    "Sniff"
-  ];
-
-  static const double threshold = 1.0;  // Threshold to trigger a crisis event
-  Map<String, List<double>> labelValues = {};
-
-  CrisisDetection() {
-    for (var label in classificationLabels) {
-      labelValues[label] = [];  // Initialize with an empty list
-    }
-  }
-
-  // Update values for each label and maintain only the last three entries
-  void updateValues(Map<String, double> incomingValues) {
-    for (var label in classificationLabels) {
-      if (incomingValues.containsKey(label)) {
-        var list = labelValues[label]!;
-        list.add(incomingValues[label]!);  // Add new value
-
-        // Maintain only the last three values
-        if (list.length > 3) {
-          list.removeAt(0);  // Remove the oldest value
-        }
-        labelValues[label] = list;
-      }
-    }
-    checkCrisis();  // Check if we should trigger a crisis action
-  }
-
-  // Check if the sum of all labels' values exceeds the threshold
-  void checkCrisis() {
-    double sum = labelValues.values.expand((i) => i).reduce((a, b) => a + b);
-    if (sum > threshold) {
-      triggerCrisisAction();
-    }
-  }
-
-  // Stub for triggering a crisis action
-  void triggerCrisisAction() {
-    // Implement action to be taken in case of crisis
-    print("Crisis detected! Taking action...");
-    // e.g., send notifications, alert authorities, etc.
-  }
-}
+ */
