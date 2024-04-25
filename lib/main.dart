@@ -608,6 +608,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
+            /*
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -631,6 +632,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+             */
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -676,7 +678,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-            ),*/
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -719,6 +721,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+             */
           ],
         ),
       ),
