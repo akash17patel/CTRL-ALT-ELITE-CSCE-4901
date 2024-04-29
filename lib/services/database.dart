@@ -9,6 +9,8 @@ What do we need database for?
 
 // Import our two packages
 
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -34,7 +36,7 @@ class MindliftDatabase {
 
   Future<Database> _initializeDatabase() async {
     String path = join(await getDatabasesPath(), 'my_database.db');
-    return await openDatabase(path, version: 1, onCreate: _onCreate);
+    return await openDatabase(path, version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   // Method to create tables
@@ -52,6 +54,12 @@ class MindliftDatabase {
     // Create a table for settings
     await _createTable(
         db, 'Settings', 'id INTEGER PRIMARY KEY, key TEXT, value TEXT');
+  }
+
+  FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // Create a table for crisis detection - messy
+    await _createTable(
+    db, 'CrisisDetection', 'id INTEGER PRIMARY KEY, key TEXT, value TEXT');
   }
 
   // Generic method to create a table
@@ -249,5 +257,26 @@ class MindliftDatabase {
     } else {
       return false; // Default value if not found
     }
+  }
+
+  Future<bool> getCrisisDetection() async {
+    final db = await database;
+    List<Map<String, dynamic>> results =
+        await db.query('CrisisDetection', where: 'key = ?', whereArgs: ['onOrOff']);
+    if (results.isNotEmpty) {
+      return results.first['value'] == '1';
+    } else {
+      return false; // Default value if not found
+    }
+  }
+
+  Future<void> setCrisisDetection(bool detect) async {
+    final db = await database;
+    print("insert crisis");
+    await db.insert(
+      'CrisisDetection',
+      {'key': 'onOrOff', 'value': detect ? '1' : '0'},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }

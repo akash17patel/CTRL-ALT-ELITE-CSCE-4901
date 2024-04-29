@@ -33,18 +33,20 @@ void main() async {
 
     await service.initialize();
 
-/*
-    if (await Permission.microphone.isGranted) { // Check microphone permission explicitly
+    bool crisisDetect = await MindliftDatabase.instance.getCrisisDetection();
+
+    if (crisisDetect) print("Crisis Detection Allowed");
+
+    if (await Permission.microphone.isGranted && crisisDetect) { // Check microphone permission explicitly
       print("Microphone permission granted.");
       //startForegroundService();
       // Moving from foreground service for demo functionality.
-      AudioClassification audioClassification = AudioClassification();
-      await audioClassification.initRecorder();
-      audioClassification.start();
+
+      await AudioClassification.instance.turnOn();
     } else {
       print("Microphone permission not granted.");
     }
-*/
+
     runApp(MyApp());
     print("App running.");
   } catch (e, s) {
@@ -445,6 +447,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false; // Variable to store dark mode state
   bool _isPincodeEnabled = false; // Variable to store pincode enabled state
+  bool _isCrisisDetectionEnabled = false;
 
   @override
   void initState() {
@@ -457,10 +460,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadSettings() async {
     bool darkMode = await MindliftDatabase.instance.getDarkMode();
     bool pincodeEnabled = await MindliftDatabase.instance.getPincode() != null;
+    bool crisisDetection = await MindliftDatabase.instance.getCrisisDetection();
 
     setState(() {
       _isDarkMode = darkMode;
       _isPincodeEnabled = pincodeEnabled;
+      _isCrisisDetectionEnabled = crisisDetection;
     });
   }
 
@@ -654,7 +659,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            /*Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -676,8 +681,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-            ),*/
-            Padding(
+            ),
+            /*Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -718,7 +723,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-            ),
+            ),*/
           ],
         ),
       ),
@@ -742,6 +747,38 @@ class _SettingsPageState extends State<SettingsPage> {
           builder: (context) => NotificationDetailsPage(
               payload: payload, delay: Duration(seconds: 10)),
         ),
+      );
+    }
+  }
+
+  void _setCrisisDetectionEnabled(bool value) async {
+    if (await Permission.microphone.isGranted) {
+      await MindliftDatabase.instance.setCrisisDetection(value);
+
+      // If value is true then turn detection, otherwise off.
+      if (value) await AudioClassification.instance.turnOn();
+      else await AudioClassification.instance.turnOff();
+      setState(() {
+        _isCrisisDetectionEnabled = value;
+      });
+    }
+    else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Microphone Permission Required"),
+            content: Text("Crisis detection only works with the microphone enabled. Please enable microphone access in your settings."),
+            actions: <Widget>[
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
     }
   }

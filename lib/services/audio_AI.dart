@@ -12,6 +12,11 @@ import 'package:audio_to_float_array/audio_to_float_array.dart';
 import 'local_notification_service.dart';
 
 class AudioClassification {
+  // Singleton
+  AudioClassification._privateConstructor(); // Private constructor for the singleton
+  static final AudioClassification instance =
+  AudioClassification._privateConstructor();
+
   static const _sampleRate = 16000; // 16kHz
   static const _expectAudioLength = 975; // milliseconds
   final int _requiredInputBuffer =
@@ -31,6 +36,7 @@ class AudioClassification {
   }
 
   Future<void> start() async {
+    if(path.isEmpty) await _setThePath();
     await _startRecording(); // Start the first recording before setting the timer
     _timer?.cancel(); // Cancel any existing timer
 
@@ -137,6 +143,17 @@ class AudioClassification {
     await file.writeAsString(jsonData);
     print("Data exported to ${file.path}");
   }
+
+  Future<void> turnOff() async{
+    _recorder.closeRecorder();
+    _helper.closeInterpreter();
+    _timer?.cancel(); // Cancel any existing timer
+  }
+
+  Future<void> turnOn() async{
+    await initRecorder();
+    await start();
+  }
 }
 
 class CrisisDetection {
@@ -200,5 +217,9 @@ class CrisisDetection {
   void triggerCrisisAction() {
     print("Crisis detected! Taking action...");
     service.showNotification(id: 5, title: "Crisis Detected", body: "Are you alright?");
+    // Clear all stored values in labelValues
+    for (var label in classificationLabels) {
+      labelValues[label] = [];
+    }
   }
 }
