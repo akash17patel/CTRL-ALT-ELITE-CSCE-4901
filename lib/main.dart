@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'conversation_history_screen.dart';
 import 'goals_screen.dart';
@@ -229,11 +230,22 @@ class _MyAppContentState extends State<MyAppContent> {
   VoidCallback? toggleCallback;
     List<Widget> _pages = [];
 
+     
+
+
+
+
+
+
   @override
   void initState() {
     toggleCallback = widget.toggleDarkThemeCallback;
+  //  getDarkModeSettings();
     _pages = [
-    HomePage(),
+   
+         HomePage(),
+      
+    
     SettingsPage(toggleDarkThemeCallback:toggleCallback!),
   ];
 
@@ -269,28 +281,28 @@ class _MyAppContentState extends State<MyAppContent> {
         backgroundColor: Color.fromARGB(255, 94, 28, 151),
         toolbarHeight: 100,
       ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/purplebg.jpg'),
-                fit: BoxFit.cover,
+      body:     Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/purplebg.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
+              PageView(
+                controller: _pageController,
+                children: _pages,
+                onPageChanged: (index) {
+                  // Set the selected index when the page changes
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+              ),
+            ],
           ),
-          PageView(
-            controller: _pageController,
-            children: _pages,
-            onPageChanged: (index) {
-              // Set the selected index when the page changes
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -341,6 +353,11 @@ class _MyAppContentState extends State<MyAppContent> {
 // Example home page widget
 class HomePage extends StatelessWidget {
   // List of names for each button
+
+
+
+
+
   final List<String> buttonNames = [
     'Button 0 Name',
     'Button 1 Name',
@@ -350,8 +367,20 @@ class HomePage extends StatelessWidget {
     'Button 5 Name',
   ];
 
+
+ 
+
+ Future<bool> getDarkModeSettings()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+   bool _isDarkMode = prefs.getBool('isDarkTheme')??false;
+   return _isDarkMode;
+   
+  }
+   
+
   @override
   Widget build(BuildContext context) {
+    
     // Set the text for the "My Goals" button
     buttonNames[0] = 'Chat';
     buttonNames[1] = 'Conversation History';
@@ -360,101 +389,107 @@ class HomePage extends StatelessWidget {
     buttonNames[4] = 'Emergency Contact';
     buttonNames[5] = 'Notifications Test';
 
-    return ListView(
-      padding: EdgeInsets.all(20),
-      children: [
-        GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 2, // 2 buttons per row
-          mainAxisSpacing: 16, // Spacing between rows
-          crossAxisSpacing: 16, // Spacing between columns
-          childAspectRatio: 1, // Adjust the aspect ratio for button height
-          children: List.generate(6, (index) {
-            return ElevatedButton(
-              onPressed: () {
-                // Navigate to a new screen when button is pressed
-                switch (index) {
-                  case 0:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(),
-                      ),
-                    );
-                    break;
-                  case 1:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ConversationHistoryScreen(),
-                      ),
-                    );
-                    break;
-                  case 2:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Goals(),
-                      ),
-                    );
-                    break;
-                  case 3:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EmotionHistory(),
-                      ),
-                    );
-                    break;
-                  case 4:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EmergencyContactsPage(),
-                      ),
-                    );
-                    break;
-                  case 5:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NotificationsPage(),
-                      ),
-                    );
-                    break;
-                  default:
-                    break;
-                }
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    const Color.fromRGBO(255, 255, 255, 0.7)),
-                textStyle: MaterialStateProperty.all<TextStyle>(
-                  TextStyle(fontSize: 20),
-                ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          60), // Set border radius to 0 for square shape
-                      side: BorderSide(
-                        color: Colors.white,
-                        width: 4,
-                      )),
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    buttonNames[index], // Centered button text
-                    textAlign: TextAlign.center,
+    return FutureBuilder<bool>(
+      future: getDarkModeSettings(),
+      builder: (context, snapshot) {
+        return ListView(
+          padding: EdgeInsets.all(20),
+          children: [
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2, // 2 buttons per row
+              mainAxisSpacing: 16, // Spacing between rows
+              crossAxisSpacing: 16, // Spacing between columns
+              childAspectRatio: 1, // Adjust the aspect ratio for button height
+              children: List.generate(6, (index) {
+                return ElevatedButton(
+                  onPressed: () {
+                    // Navigate to a new screen when button is pressed
+                    switch (index) {
+                      case 0:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(),
+                          ),
+                        );
+                        break;
+                      case 1:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ConversationHistoryScreen(),
+                          ),
+                        );
+                        break;
+                      case 2:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Goals(),
+                          ),
+                        );
+                        break;
+                      case 3:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EmotionHistory(),
+                          ),
+                        );
+                        break;
+                      case 4:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EmergencyContactsPage(),
+                          ),
+                        );
+                        break;
+                      case 5:
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NotificationsPage(),
+                          ),
+                        );
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                  style: ButtonStyle(
+                    backgroundColor:snapshot.data==true ?MaterialStateProperty.all<Color>(Colors.black.withOpacity(.75)): MaterialStateProperty.all<Color>(
+                        const Color.fromRGBO(255, 255, 255, 0.7)),
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      TextStyle(fontSize: 20),
+                    ),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              60), // Set border radius to 0 for square shape
+                          side: BorderSide(
+                            color:snapshot.data ==true?Colors.grey: Colors.white,
+                            width: 4,
+                          )),
+                    ),
                   ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        buttonNames[index], // Centered button text
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.purple),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ],
+        );
+      }
     );
   }
 }
