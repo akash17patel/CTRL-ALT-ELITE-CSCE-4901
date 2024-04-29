@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'services/database.dart';
 
 void main() {
@@ -154,18 +155,23 @@ class _EmergencyContactsPageState extends State<EmergencyContactsPage> {
       body: ListView.builder(
         itemCount: contacts.length,
         itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(contacts[index]['name'] ?? ''),
-            subtitle: Text(
-              contacts[index]['phone'] ?? '',
-              style: TextStyle(color: Colors.purple), // Change color to purple
-            ),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                //deletes contact when delete icon is pressed
-                _deleteContact(index);
-              },
+          return InkWell(
+            onTap: (){
+              launchUrlString('tel://${contacts[index]['phone']}');
+            },
+            child: ListTile(
+              title: Text(contacts[index]['name'] ?? ''),
+              subtitle: Text(
+                contacts[index]['phone'] ?? '',
+                style: TextStyle(color: Colors.purple), // Change color to purple
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  //deletes contact when delete icon is pressed
+                  _deleteContact(index);
+                },
+              ),
             ),
           );
         },

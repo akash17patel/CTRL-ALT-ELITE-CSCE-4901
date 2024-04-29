@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ResourcesPage extends StatelessWidget {
   @override
@@ -39,38 +40,38 @@ class ResourcesPage extends StatelessWidget {
                     ResourceTile(
                       title: 'Emergency Services',
                       subtitle: '911',
-                      url: 'tel:911', // Phone number URL
+                      url: 'tel://911', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'Suicide Hotline',
                       subtitle: '1-800-273-TALK',
-                      url: 'tel:1-800-273-8255', // Phone number URL
+                      url: 'tel://1-800-273-8255', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'National Domestic Violence Hotline',
                       subtitle: '1-800-799-SAFE',
-                      url: 'tel:1-800-799-7233', // Phone number URL
+                      url: 'tel://1-800-799-7233', // Phone number URL
                     ),
                     ResourceTile(
                       title:
                       'Substance Abuse and Mental Health Services Administration (SAMHSA)',
                       subtitle: '1-800-662-HELP',
-                      url: 'tel:1-800-662-4357', // Phone number URL
+                      url: 'tel://1-800-662-4357', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'National Alliance on Mental Illness (NAMI)',
                       subtitle: '1-800-950-NAMI',
-                      url: 'tel:1-800-950-6264', // Phone number URL
+                      url: 'tel://1-800-950-6264', // Phone number URL
                     ),
                     ResourceTile(
                       title: 'Crisis Text Line',
                       subtitle: 'Text HOME to 741741',
-                      url: 'sms:741741?body=HOME', // Crisis text line URL
+                      url: 'sms://741741?body=HOME', // Crisis text line URL
                     ),
                     ResourceTile(
                       title: 'Veterans Crisis Line (Press 1)',
                       subtitle: '1-800-273-8255',
-                      url: 'tel:1-800-273-8255', // Phone number URL
+                      url: 'tel://1-800-273-8255', // Phone number URL
                     ),
                   ],
                 ),
@@ -113,7 +114,8 @@ class ResourceTile extends StatelessWidget {
         ),
       ),
       onTap: () {
-        _launchResource(url);
+       //_launchResource(url);
+       launchUrlString(url);
       },
     );
   }
