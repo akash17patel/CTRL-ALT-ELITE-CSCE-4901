@@ -36,7 +36,7 @@ class MindliftDatabase {
 
   Future<Database> _initializeDatabase() async {
     String path = join(await getDatabasesPath(), 'my_database.db');
-    return await openDatabase(path, version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   // Method to create tables
@@ -54,12 +54,9 @@ class MindliftDatabase {
     // Create a table for settings
     await _createTable(
         db, 'Settings', 'id INTEGER PRIMARY KEY, key TEXT, value TEXT');
-  }
 
-  FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Create a table for crisis detection - messy
     await _createTable(
-    db, 'CrisisDetection', 'id INTEGER PRIMARY KEY, key TEXT, value TEXT');
+        db, 'CrisisDetection', 'id INTEGER PRIMARY KEY, value TEXT');
   }
 
   // Generic method to create a table
@@ -262,7 +259,7 @@ class MindliftDatabase {
   Future<bool> getCrisisDetection() async {
     final db = await database;
     List<Map<String, dynamic>> results =
-        await db.query('CrisisDetection', where: 'key = ?', whereArgs: ['onOrOff']);
+        await db.query('CrisisDetection', where: 'id = 1');
     if (results.isNotEmpty) {
       return results.first['value'] == '1';
     } else {
@@ -275,7 +272,7 @@ class MindliftDatabase {
     print("insert crisis");
     await db.insert(
       'CrisisDetection',
-      {'key': 'onOrOff', 'value': detect ? '1' : '0'},
+      {'id': 1, 'value': detect ? '1' : '0'},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
