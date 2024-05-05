@@ -196,7 +196,6 @@ class AIClassifier {
           "Wow, that sounds unexpected. Can you share more details?",
           "That sounds unexpected! What surprised you exactly?",
           "Surprises can really throw us off. How did you react?",
-          "Wow, didn't see that coming! Do you want to talk more about it?",
           "Life is full of surprises. Was this a welcome one for you?",
           "Surprise can be exciting or shocking. What are your thoughts on what happened?",
         ];
